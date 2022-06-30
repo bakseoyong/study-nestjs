@@ -1,0 +1,12 @@
+delete-user
+
+// Check if the post author is null
+
+
+hot-boards
+
+// Boards made yesterday that have more than 10 likes.
+
+report-board
+
+// Report board (Move to report table if report more than 5)
