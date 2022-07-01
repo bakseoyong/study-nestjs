@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Socket } from 'socket.io';
 import { Board } from 'src/entity/board.entity';
 import { BoardRepository } from 'src/repository/board.repository';
 import { RecommendRepository } from 'src/repository/recommend.repository';
@@ -86,8 +87,6 @@ export class BoardService {
   }
 
   getPopularBoards(): Promise<Board[]> {
-    //const date = new Date().;
-
     return this.boardRepository.getPopularBoards();
   }
 }

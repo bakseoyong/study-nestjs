@@ -4,6 +4,7 @@ import { typeORMConfig } from './configs/typeorm.config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { BoardModule } from './board/board.module';
+import { EventsGateway } from './events/gateway';
 
 @Module({
   imports: [
@@ -13,6 +14,6 @@ import { BoardModule } from './board/board.module';
     BoardModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [EventsGateway],
 })
 export class AppModule {}

@@ -13,3 +13,7 @@ report-board
 popular-board
 
 // Boards with 5 likes within 1 hours
+
+realtime-display-likes
+
+// Show users real-time 'likes' increase using socket in NestJS.

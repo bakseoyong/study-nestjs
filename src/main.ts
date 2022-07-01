@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { setupSwagger } from './utils/swagger';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -29,6 +30,9 @@ async function bootstrap() {
     //   disableErrorMessages: true,
     // }),
     ();
+
+  //Socket.io
+  app.useWebSocketAdapter(new IoAdapter(app));
 
   //Swagger
   setupSwagger(app);
