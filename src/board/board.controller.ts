@@ -87,4 +87,10 @@ export class BoardController {
   // reportMoreThan5boards(): Promise<Board[]> {
   //   return this.boardService.findMoreThan5Reports();
   // }
+
+  @Get('/popular-boards')
+  @UsePipes(ValidationPipe)
+  getPopularBoards(): Promise<Board[]> {
+    return this.boardService.getPopularBoards();
+  }
 }

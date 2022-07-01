@@ -10,15 +10,11 @@ import {
   EntityManager,
   EntityRepository,
   getConnection,
-  IsNull,
-  LessThan,
-  MoreThan,
   MoreThanOrEqual,
   Repository,
   TransactionManager,
 } from 'typeorm';
 import { PaginationBoardDto } from 'src/board/dto/pagination-boards.dto';
-import { buildPaginator } from 'typeorm-cursor-pagination';
 
 @EntityRepository(Board) //@EntityRepository deprecated in typeorm@^0.3.6
 export class BoardRepository extends Repository<Board> {
@@ -174,37 +170,47 @@ export class BoardRepository extends Repository<Board> {
     return await boards.execute();
   }
 
-  // async getSortedNewlyBoards(
-  //   paginationBoardDto: PaginationBoardDto,
-  // ): Promise<Board[]> {
-  //   let cursor = paginationBoardDto.cursor;
-  //   if (cursor === undefined) {
-  //     cursor = '999999' + '9999999999';
-  //   }
-  //   const boards = await getConnection()
-  //     .createQueryBuilder()
-  //     .select([
-  //       'boards.id',
-  //       'boards.author',
-  //       'boards.likes',
-  //       'boards.title',
-  //       'boards.content',
-  //       'boards.created',
-  //       'boards.updated',
-  //       'boards.deleted',
-  //       'concat(lpad(boards.likes, 5, ' +
-  //         0 +
-  //         '), lpad(boards.id, 10, ' +
-  //         0 +
-  //         ')) as cursorr',
-  //     ])
-  //     .from(Board, 'boards')
-  //     // Not where !
-  //     .having('cursorr < :cursorr', { cursorr: cursor })
-  //     .orderBy('likes', 'DESC')
-  //     .orderBy('id', 'DESC')
-  //     .take(paginationBoardDto.limit);
+  async getSortedNewlyBoards(
+    paginationBoardDto: PaginationBoardDto,
+  ): Promise<Board[]> {
+    let cursor = paginationBoardDto.cursor;
+    if (cursor === undefined) {
+      cursor = '999999' + '9999999999';
+    }
+    const boards = await getConnection()
+      .createQueryBuilder()
+      .select(
+        'concat(lpad(boards.likes, 5, ' +
+          0 +
+          '), lpad(boards.id, 10, ' +
+          0 +
+          ')) as cursorr',
+      )
+      // .addSelect(
+      //   'concat(lpad(boards.likes, 5, ' +
+      //     0 +
+      //     '), lpad(boards.id, 10, ' +
+      //     0 +
+      //     ')) as cursorr',
+      // )
+      .from(Board, 'boards')
+      .orderBy('likes', 'DESC')
+      .orderBy('id', 'DESC')
+      .take(paginationBoardDto.limit);
 
-  //   return await boards.execute();
-  // }
+    return await boards.execute();
+  }
+
+  async getPopularBoards(): Promise<Board[]> {
+    const date = new Date();
+    date.setHours(date.getHours() - 1);
+    // Logger.log(date);
+    return await this.find({
+      where: {
+        likes: MoreThanOrEqual(5),
+        created: MoreThanOrEqual(date),
+      },
+    });
+    // return [];
+  }
 }

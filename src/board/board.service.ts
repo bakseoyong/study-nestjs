@@ -72,16 +72,22 @@ export class BoardService {
   //   return this.boardRepository.findMoreThan5Reports(dateFormatter());
   // }
 
-  async getBoardsUsingCursor(
+  getBoardsUsingCursor(
     paginationBoardsDto: PaginationBoardDto,
   ): Promise<Board[]> {
     switch (paginationBoardsDto.type) {
       case SortType.LIKES: {
         return this.boardRepository.getSortedLikesBoards(paginationBoardsDto);
       }
-      // case SortType.NEWLY: {
-      //   return this.boardRepository.getSortedNewlyBoards(paginationBoardsDto);
-      // }
+      case SortType.NEWLY: {
+        return this.boardRepository.getSortedNewlyBoards(paginationBoardsDto);
+      }
     }
+  }
+
+  getPopularBoards(): Promise<Board[]> {
+    //const date = new Date().;
+
+    return this.boardRepository.getPopularBoards();
   }
 }

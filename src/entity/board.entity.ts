@@ -18,7 +18,7 @@ export class Board extends BaseEntity {
   @Column({ type: 'varchar', comment: 'author' })
   author: string;
 
-  @Column({ type: 'integer', comment: 'likes' })
+  @Column({ type: 'integer', default: 0, comment: 'likes' })
   likes: number;
 
   @Column({ type: 'varchar', comment: 'Title' })
