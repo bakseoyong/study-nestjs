@@ -5,7 +5,7 @@ import { RecommendRepository } from 'src/repository/recommend.repository';
 import { ReportRepository } from 'src/repository/report.repository';
 import { getConnection } from 'typeorm';
 import { CreateBoardDto } from './dto/create-board.dto';
-import { PagenationBoardsDto } from './dto/pagenation-boards.dto';
+import { PaginationBoardDto, SortType } from './dto/pagination-boards.dto';
 
 @Injectable()
 export class BoardService {
@@ -72,32 +72,16 @@ export class BoardService {
   //   return this.boardRepository.findMoreThan5Reports(dateFormatter());
   // }
 
-  async loadPagenationBoards(
-    pagenationBoardsDto: PagenationBoardsDto,
+  async getBoardsUsingCursor(
+    paginationBoardsDto: PaginationBoardDto,
   ): Promise<Board[]> {
-    const queryRunner = await getConnection().createQueryRunner();
-    await queryRunner.startTransaction();
-
-    try {
-      if (pagenationBoardsDto.likes !== undefined) {
-        //count랑 page는 같이가는거고, findcursor에서 리턴값이 추천수에 맞게 조정될것이고 load에서도 추천수에 맞게 정렬된다음에 갈것이다
-        //같은 좋아요수가 나올 가능성이 크므로 도움을 받았던 게시물을 다시 한번 살펴보기
-        const test = await this.boardRepository.findLikesCursor(
-          pagenationBoardsDto,
-        );
+    switch (paginationBoardsDto.type) {
+      case SortType.LIKES: {
+        return this.boardRepository.getSortedLikesBoards(paginationBoardsDto);
       }
-      const cursor = await this.boardRepository.findCursor(pagenationBoardsDto);
-
-      Logger.log(`loadPagenationBoards cursor is : ${cursor}`);
-      const boards = await this.boardRepository.loadPagenationBoards(
-        pagenationBoardsDto,
-        cursor,
-      );
-      await queryRunner.commitTransaction();
-
-      return boards;
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
+      // case SortType.NEWLY: {
+      //   return this.boardRepository.getSortedNewlyBoards(paginationBoardsDto);
+      // }
     }
   }
 }

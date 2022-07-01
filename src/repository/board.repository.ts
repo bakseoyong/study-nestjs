@@ -17,7 +17,7 @@ import {
   Repository,
   TransactionManager,
 } from 'typeorm';
-import { PagenationBoardsDto } from 'src/board/dto/pagenation-boards.dto';
+import { PaginationBoardDto } from 'src/board/dto/pagination-boards.dto';
 import { buildPaginator } from 'typeorm-cursor-pagination';
 
 @EntityRepository(Board) //@EntityRepository deprecated in typeorm@^0.3.6
@@ -140,37 +140,15 @@ export class BoardRepository extends Repository<Board> {
     }
   }
 
-  async findCursor(pagenationBoardsDto: PagenationBoardsDto): Promise<number> {
-    const total = await this.count();
-    Logger.log(`total is ${total}`);
-    const cursor =
-      total - pagenationBoardsDto.count * (pagenationBoardsDto.page - 1) + 1;
-    if (total < pagenationBoardsDto.count) return total + 1;
-    else return cursor;
-  } //1200개 게시물 . 1200 - 20 = 1201(1페이지) 1181(2페이지) 1161(3페이지)
-  //1개 게시물. 1 - 0 = 1(1페이지)
-
-  async loadPagenationBoards(
-    pagenationBoardsDto: PagenationBoardsDto,
-    cursor: number,
+  async getSortedLikesBoards(
+    paginationBoardDto: PaginationBoardDto,
   ): Promise<Board[]> {
-    const boards = await this.find({
-      order: {
-        id: 'DESC',
-      },
-      where: {
-        id: LessThan(cursor), //Not LessEqualThan, 'limit' load N boards next to cursor.
-      },
-      take: pagenationBoardsDto.count, //limit
-    });
-
-    return boards;
-  }
-
-  async findLikesCursor(
-    pagenationBoardsDto: PagenationBoardsDto,
-  ): Promise<number> {
-    const queryBuilder = this.createQueryBuilder('boards')
+    let cursor = paginationBoardDto.cursor;
+    if (cursor === undefined) {
+      cursor = '999999' + '9999999999';
+    }
+    const boards = await getConnection()
+      .createQueryBuilder()
       .select([
         'boards.id',
         'boards.author',
@@ -180,13 +158,53 @@ export class BoardRepository extends Repository<Board> {
         'boards.created',
         'boards.updated',
         'boards.deleted',
-        `CONCAT(LPAD(boards.likes, 6, '0'), LPAD(board.id, 10, '0')) AS cursor`,
+        'concat(lpad(boards.likes, 5, ' +
+          0 +
+          '), lpad(boards.id, 10, ' +
+          0 +
+          ')) as cursorr',
       ])
-      .orderBy('cursor', 'DESC');
+      .from(Board, 'boards')
+      // Not where !
+      .having('cursorr < :cursorr', { cursorr: cursor })
+      .orderBy('likes', 'DESC')
+      .orderBy('id', 'DESC')
+      .take(paginationBoardDto.limit);
 
-    const paginator = buildPaginator({
-      entity: Board,
-      paginationKeys: [''],
-    });
+    return await boards.execute();
   }
+
+  // async getSortedNewlyBoards(
+  //   paginationBoardDto: PaginationBoardDto,
+  // ): Promise<Board[]> {
+  //   let cursor = paginationBoardDto.cursor;
+  //   if (cursor === undefined) {
+  //     cursor = '999999' + '9999999999';
+  //   }
+  //   const boards = await getConnection()
+  //     .createQueryBuilder()
+  //     .select([
+  //       'boards.id',
+  //       'boards.author',
+  //       'boards.likes',
+  //       'boards.title',
+  //       'boards.content',
+  //       'boards.created',
+  //       'boards.updated',
+  //       'boards.deleted',
+  //       'concat(lpad(boards.likes, 5, ' +
+  //         0 +
+  //         '), lpad(boards.id, 10, ' +
+  //         0 +
+  //         ')) as cursorr',
+  //     ])
+  //     .from(Board, 'boards')
+  //     // Not where !
+  //     .having('cursorr < :cursorr', { cursorr: cursor })
+  //     .orderBy('likes', 'DESC')
+  //     .orderBy('id', 'DESC')
+  //     .take(paginationBoardDto.limit);
+
+  //   return await boards.execute();
+  // }
 }
