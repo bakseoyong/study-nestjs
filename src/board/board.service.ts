@@ -51,6 +51,7 @@ export class BoardService {
       return likes;
     } catch (error) {
       await queryRunner.rollbackTransaction();
+      Logger.log(error);
     }
   }
 

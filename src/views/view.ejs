@@ -6,8 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="http://localhost:8080/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script>
       const path = window.location.pathname;
+      const boardId = path.split('/')[3];
+      const token =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJubyI6IjMxZmI1NjI5LTc4ZTYtNGQ3Mi1iZTQ4LTJkMjNlYWJlMzJkNSIsInJvbGUiOiJNRU1FQkVSIiwiaWQiOiJiYWtzZW95b25nIiwiZW1haWwiOiJxd2Vya2R1ZDE5OTlAbmF2ZXIuY29tIiwicGhvbmUiOm51bGwsImNyZWF0ZWQiOiIyMDIyLTA2LTI1VDA2OjUxOjQ0LjI1MloiLCJ1cGRhdGVkIjoiMjAyMi0wNi0yNVQwNjo1MTo0NC4yNTJaIiwiZGVsZXRlZCI6bnVsbCwiaWF0IjoxNjU2NzUyOTQzLCJleHAiOjE2NTY3NTQ3NDN9.3za4p59Yg2gqvmY88smktU1OqRa8763_zz17oIzieu4';
+
       const socket = io('http://localhost:8080/board/view/:id', {
         transport: ['websocket'],
       });
@@ -33,16 +38,40 @@
       socket.on(path, function (data) {
         console.log(data);
       });
+      socket.on('pressLikes', function (data) {
+        console.log(`Who press likes ${data.likes}`);
+        document.getElementById('likes').textContent = data.likes;
+      });
 
       async function increase_likes_btn() {
         const likes = document.getElementById('likes').innerText;
         socket.emit('pressLikes', { path: path, likes: likes });
       }
 
-      socket.on('pressLikes', function (data) {
-        console.log(`Who press likes ${data.likes}`);
-        document.getElementById('likes').textContent = data.likes;
+      $(function () {
+        $('#increase_likes_btn').on('click', increaseLikesBtn);
       });
+
+      function increaseLikesBtn() {
+        $.ajax({
+          url: `/board/recommend-board/${boardId}`,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          method: 'GET',
+          dataType: 'text',
+          success: function (data, status) {
+            console.log(data, status);
+          },
+          error: function (status, error) {
+            console.log(error, status);
+          },
+        });
+      }
+      // $.get(`/board/recommend-board/${boardId}`),
+      //   function (data, status) {
+      //     console.log(data, status);
+      //   };
     </script>
   </head>
   <body>

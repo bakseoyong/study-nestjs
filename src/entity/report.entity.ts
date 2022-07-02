@@ -6,7 +6,7 @@ import {
   Unique,
 } from 'typeorm';
 
-@Entity({ name: 'recommends' })
+@Entity({ name: 'reports' })
 @Unique(['id'])
 export class Report extends BaseEntity {
   @PrimaryGeneratedColumn()

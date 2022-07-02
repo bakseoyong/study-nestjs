@@ -14,14 +14,20 @@ export class RecommendRepository extends Repository<Recommend> {
     boardId: number,
     recommender: string,
   ): Promise<boolean> {
+    Logger.log(`${boardId}, ${recommender}`);
     try {
-      const recommend = await transactionManager.save({ boardId, recommender });
+      const recommend = await transactionManager.save(Recommend, {
+        boardId,
+        recommender,
+      });
       return recommend ? true : false;
     } catch (error) {
+      Logger.log(error);
       throw new HttpException(
         {
           message: 'SQL Error',
           error: error.sqlMessage,
+          //error: error,
         },
         HttpStatus.FORBIDDEN,
       );
