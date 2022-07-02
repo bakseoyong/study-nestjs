@@ -9,6 +9,8 @@ import {
   UseGuards,
   Req,
   Query,
+  Render,
+  Header,
 } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
 import { CreateBoardDto } from './dto/create-board.dto';
@@ -20,7 +22,15 @@ import { PaginationBoardDto } from './dto/pagination-boards.dto';
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
+  @Get('/chat')
+  @Render('chat.ejs')
+  @Header('Access-Control-Allow-Origin', 'http://localhost:3000')
+  abc(): any {
+    return { a: true };
+  }
+
   @Get('/view/:id')
+  @Render('view.ejs')
   getBoardById(@Param('id') id: number): Promise<Board> {
     return this.boardService.getBoardById(id);
   }

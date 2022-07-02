@@ -17,3 +17,5 @@ popular-board
 realtime-display-likes
 
 // Show users real-time 'likes' increase using socket in NestJS.
+// Step 1 : Broadcast likes increase.
+// Step 2 : Connecting URL.

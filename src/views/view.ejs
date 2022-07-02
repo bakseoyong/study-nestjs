@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="http://localhost:8080/socket.io/socket.io.js"></script>
+    <script>
+      const path = window.location.pathname;
+      const socket = io('http://localhost:8080/board/view/:id', {
+        transport: ['websocket'],
+      });
+      socket.on('connect', function () {
+        console.log('Connected');
+
+        //socket.emit('events', { path: window.location.pathname });
+        socket.emit('createRoom', { path: window.location.pathname });
+        //socket.emit(path, { path: window.loation.pathname });
+        socket.emit('identity', 0, (response) =>
+          console.log('Identity:', response),
+        );
+      });
+      socket.on('events', function (data) {
+        console.log('event', data);
+      });
+      socket.on('exception', function (data) {
+        console.log('event', data);
+      });
+      socket.on('disconnect', function () {
+        console.log('Disconnected');
+      });
+      socket.on(path, function (data) {
+        console.log(data);
+      });
+
+      async function increase_likes_btn() {
+        const likes = document.getElementById('likes').innerText;
+        socket.emit('pressLikes', { path: path, likes: likes });
+      }
+
+      socket.on('pressLikes', function (data) {
+        console.log(`Who press likes ${data.likes}`);
+        document.getElementById('likes').textContent = data.likes;
+      });
+    </script>
+  </head>
+  <body>
+    <%= title %> <%= author %>
+    <button id="increase_likes_btn" onclick="increase_likes_btn()"></button>
+    <h1 id="likes"><%= likes %></h1>
+    <%= content %>
+  </body>
+</html>
