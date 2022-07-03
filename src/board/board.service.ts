@@ -2,10 +2,13 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { Board } from 'src/entity/board.entity';
 import { BoardRepository } from 'src/repository/board.repository';
+import { CommentRepository } from 'src/repository/comment.repository';
 import { RecommendRepository } from 'src/repository/recommend.repository';
 import { ReportRepository } from 'src/repository/report.repository';
 import { getConnection } from 'typeorm';
 import { CreateBoardDto } from './dto/create-board.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { InitViewDto } from './dto/init-view.dto';
 import { PaginationBoardDto, SortType } from './dto/pagination-boards.dto';
 
 @Injectable()
@@ -14,10 +17,33 @@ export class BoardService {
     private readonly boardRepository: BoardRepository,
     private readonly recommendRepository: RecommendRepository,
     private readonly reportRepository: ReportRepository,
+    private readonly commentRepository: CommentRepository,
   ) {}
 
-  getBoardById(id: number): Promise<Board> {
-    return this.boardRepository.getBoardById(id);
+  async getBoardById(id: number): Promise<InitViewDto> {
+    const queryRunner = await getConnection().createQueryRunner();
+    await queryRunner.startTransaction();
+
+    try {
+      const board = await this.boardRepository.getBoardById(
+        queryRunner.manager,
+        id,
+      );
+
+      const comments = await this.commentRepository.getOldest20Comments(
+        queryRunner.manager,
+        id,
+      );
+
+      const initViewDto: InitViewDto = { board: board, comments: comments };
+
+      await queryRunner.commitTransaction();
+
+      return initViewDto;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      Logger.log(error);
+    }
   }
 
   createBoard(createBoardDto: CreateBoardDto): Promise<boolean> {
@@ -89,5 +115,9 @@ export class BoardService {
 
   getPopularBoards(): Promise<Board[]> {
     return this.boardRepository.getPopularBoards();
+  }
+
+  createComment(createCommentDto: CreateCommentDto): Promise<boolean> {
+    return this.commentRepository.createComment(createCommentDto);
   }
 }

@@ -18,9 +18,14 @@ import { PaginationBoardDto } from 'src/board/dto/pagination-boards.dto';
 
 @EntityRepository(Board) //@EntityRepository deprecated in typeorm@^0.3.6
 export class BoardRepository extends Repository<Board> {
-  async getBoardById(id: number): Promise<Board> {
+  async getBoardById(
+    @TransactionManager() transactionManager: EntityManager,
+    id: number,
+  ): Promise<Board> {
     try {
-      const board = await this.findOne({ where: { id: id } });
+      const board = await transactionManager.findOne(Board, {
+        where: { id: id },
+      });
 
       if (!board) {
         throw new NotFoundException('The post does not exist');

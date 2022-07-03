@@ -18,18 +18,22 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardService } from './board.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { PaginationBoardDto } from './dto/pagination-boards.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { InitViewDto } from './dto/init-view.dto';
 
 @Controller('board')
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
   @Get('/view/:id')
-  @Render('view.ejs')
-  getBoardById(@Param('id') id: number): Promise<Board> {
+  //@Render('view.ejs')
+  getBoardById(@Param('id') id: number): Promise<InitViewDto> {
     return this.boardService.getBoardById(id);
   }
 
   @Post('/create-board')
+  @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   createBoard(@Body() createBoardDto: CreateBoardDto): Promise<boolean> {
     return this.boardService.createBoard(createBoardDto);
@@ -96,5 +100,17 @@ export class BoardController {
   @UsePipes(ValidationPipe)
   getPopularBoards(): Promise<Board[]> {
     return this.boardService.getPopularBoards();
+  }
+
+  @Post('/create-comment/:id')
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(ValidationPipe)
+  createComment(@Param() param, @Body() data, @Req() req): Promise<boolean> {
+    const createCommentDto: CreateCommentDto = {
+      boardId: param.id,
+      content: data.content,
+      commenter: req.user.no,
+    };
+    return this.boardService.createComment(createCommentDto);
   }
 }

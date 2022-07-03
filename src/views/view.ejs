@@ -75,9 +75,9 @@
     </script>
   </head>
   <body>
-    <%= title %> <%= author %>
+    <%= board.title %> <%= board.author %>
     <button id="increase_likes_btn" onclick="increase_likes_btn()"></button>
-    <h1 id="likes"><%= likes %></h1>
-    <%= content %>
+    <h1 id="likes"><%= board.likes %></h1>
+    <%= board.content %>
   </body>
 </html>
