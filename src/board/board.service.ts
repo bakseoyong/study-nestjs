@@ -5,11 +5,13 @@ import { BoardRepository } from 'src/repository/board.repository';
 import { CommentRepository } from 'src/repository/comment.repository';
 import { RecommendRepository } from 'src/repository/recommend.repository';
 import { ReportRepository } from 'src/repository/report.repository';
+import { ScrapRepository } from 'src/repository/scrap.repository';
 import { getConnection } from 'typeorm';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { InitViewDto } from './dto/init-view.dto';
 import { PaginationBoardDto, SortType } from './dto/pagination-boards.dto';
+import { ScrapBoardDto } from './dto/scrap-board.dto';
 
 @Injectable()
 export class BoardService {
@@ -18,6 +20,7 @@ export class BoardService {
     private readonly recommendRepository: RecommendRepository,
     private readonly reportRepository: ReportRepository,
     private readonly commentRepository: CommentRepository,
+    private readonly scrapRepository: ScrapRepository,
   ) {}
 
   async getBoardById(id: number): Promise<InitViewDto> {
@@ -119,5 +122,9 @@ export class BoardService {
 
   createComment(createCommentDto: CreateCommentDto): Promise<boolean> {
     return this.commentRepository.createComment(createCommentDto);
+  }
+
+  scrapBoard(scrapBoardDto: ScrapBoardDto): Promise<boolean> {
+    return this.scrapRepository.createScrap(scrapBoardDto);
   }
 }

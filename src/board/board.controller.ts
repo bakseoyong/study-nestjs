@@ -9,18 +9,15 @@ import {
   UseGuards,
   Req,
   Query,
-  Render,
-  Header,
-  Logger,
 } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardService } from './board.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { PaginationBoardDto } from './dto/pagination-boards.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { InitViewDto } from './dto/init-view.dto';
+import { ScrapBoardDto } from './dto/scrap-board.dto';
 
 @Controller('board')
 export class BoardController {
@@ -112,5 +109,16 @@ export class BoardController {
       commenter: req.user.no,
     };
     return this.boardService.createComment(createCommentDto);
+  }
+
+  @Get('/scrab-board/:id')
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(ValidationPipe)
+  scrapBoard(@Param() param, @Req() req): Promise<boolean> {
+    const scrapBoardDto: ScrapBoardDto = {
+      boardId: param.boardId,
+      userId: req.user.no,
+    };
+    return this.boardService.scrapBoard(scrapBoardDto);
   }
 }
