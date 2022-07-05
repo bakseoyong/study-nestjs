@@ -112,4 +112,19 @@ export class UserRepository extends Repository<User> {
       );
     }
   }
+
+  async followUser(followId: string, follower: string): Promise<boolean> {
+    const user1 = await this.findOne(followId, {
+      relations: ['following'],
+    });
+    const user2 = await this.findOne(follower, {
+      relations: ['follower'],
+    });
+    user1.following.push(user2);
+    user2.follower.push(user1);
+    await this.save(user1);
+    await this.save(user2);
+
+    return true;
+  }
 }

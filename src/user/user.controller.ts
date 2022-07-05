@@ -3,8 +3,10 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Patch,
   Post,
+  Req,
   Request,
   UseGuards,
   UsePipes,
@@ -14,7 +16,6 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { User } from 'src/entity/user.entity';
 import { CreateUserDto } from './dto/createUser.dto';
-import { LoginUserDto } from './dto/loginUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { UserService } from './user.service';
 
@@ -49,7 +50,13 @@ export class UserController {
 
   @UseGuards(LocalAuthGuard)
   @Post('/auth-login')
-  async login(@Request() req) {
+  login(@Request() req) {
     return req.user;
+  }
+
+  @Get('/follow-user/:id')
+  @UseGuards(JwtAuthGuard)
+  followUser(@Param() param, @Req() req): Promise<boolean> {
+    return this.userService.followUser(param.id, req.user.id);
   }
 }
