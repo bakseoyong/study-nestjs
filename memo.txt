@@ -23,3 +23,6 @@ realtime-display-likes
 refactoring view board
 
 // add 20 comments in response json data.
+
+스크랩 개수, 댓글 개수 => 삭제 시 스크랩 개수 감소, 댓글 개수 감소
+스크랩한 게시글 조회

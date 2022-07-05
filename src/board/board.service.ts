@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { Board } from 'src/entity/board.entity';
+import { Scrap } from 'src/entity/scrap.entity';
 import { BoardRepository } from 'src/repository/board.repository';
 import { CommentRepository } from 'src/repository/comment.repository';
 import { RecommendRepository } from 'src/repository/recommend.repository';
@@ -120,11 +121,63 @@ export class BoardService {
     return this.boardRepository.getPopularBoards();
   }
 
-  createComment(createCommentDto: CreateCommentDto): Promise<boolean> {
-    return this.commentRepository.createComment(createCommentDto);
+  async createComment(createCommentDto: CreateCommentDto): Promise<boolean> {
+    const queryRunner = await getConnection().createQueryRunner();
+    await queryRunner.startTransaction();
+
+    try {
+      await this.commentRepository.createComment(
+        queryRunner.manager,
+        createCommentDto,
+      );
+      const result = await this.boardRepository.createComment(
+        queryRunner.manager,
+        createCommentDto.boardId,
+      );
+
+      queryRunner.commitTransaction();
+
+      return result;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      Logger.log(error);
+    }
   }
 
-  scrapBoard(scrapBoardDto: ScrapBoardDto): Promise<boolean> {
-    return this.scrapRepository.createScrap(scrapBoardDto);
+  async scrapBoard(scrapBoardDto: ScrapBoardDto): Promise<boolean> {
+    const queryRunner = await getConnection().createQueryRunner();
+    await queryRunner.startTransaction();
+
+    try {
+      //scrap에 board넣기
+      const scrap = await this.scrapRepository.createScrap(
+        queryRunner.manager,
+        scrapBoardDto,
+      );
+      const result = await this.boardRepository.createScrap(
+        queryRunner.manager,
+        scrapBoardDto.boardId,
+        scrap,
+      );
+
+      queryRunner.commitTransaction();
+
+      return result ? true : false;
+    } catch (error) {
+      queryRunner.rollbackTransaction();
+    }
+  }
+
+  //스크랩한 게시물들의 내용 ( scraps + boards )
+  async getScrapBoardsFindByUserId(userId: string): Promise<any> {
+    // const queryRunner = await getConnection().createQueryRunner();
+    // await queryRunner.startTransaction();
+
+    // try {
+    return this.scrapRepository.findScrapsByUserId(userId);
+    // } catch (error) {
+    //   await queryRunner.rollbackTransaction();
+    //   Logger.log(error);
+    // }
   }
 }

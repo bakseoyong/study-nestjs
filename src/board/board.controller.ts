@@ -111,14 +111,21 @@ export class BoardController {
     return this.boardService.createComment(createCommentDto);
   }
 
-  @Get('/scrab-board/:id')
+  @Get('/scrap-board/:id')
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   scrapBoard(@Param() param, @Req() req): Promise<boolean> {
     const scrapBoardDto: ScrapBoardDto = {
-      boardId: param.boardId,
+      boardId: param.id,
       userId: req.user.no,
     };
     return this.boardService.scrapBoard(scrapBoardDto);
+  }
+
+  @Get('/my-scrap-boards')
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(ValidationPipe)
+  getScrapBoardsFindByUserId(@Req() req): Promise<Board[]> {
+    return this.boardService.getScrapBoardsFindByUserId(req.user.no);
   }
 }

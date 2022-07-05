@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Comment } from './comment.entity';
+import { Scrap } from './scrap.entity';
 
 @Entity({ name: 'boards' })
 @Unique(['id'])
@@ -22,6 +23,12 @@ export class Board extends BaseEntity {
 
   @Column({ type: 'integer', default: 0, comment: 'likes' })
   likes: number;
+
+  @Column({ type: 'integer', default: 0, comment: 'num of comments' })
+  comments: number;
+
+  @Column({ type: 'integer', comment: 'num of scraps' })
+  scraps: number;
 
   @Column({ type: 'varchar', comment: 'Title' })
   title: string;
@@ -37,4 +44,8 @@ export class Board extends BaseEntity {
 
   @DeleteDateColumn({ name: 'deleted', comment: 'Deleted Date' })
   deleted: Date;
+
+  // '/board/my-scrap-board' JOIN
+  @OneToMany((type) => Scrap, (scrap) => scrap.board)
+  scrap: Scrap[];
 }

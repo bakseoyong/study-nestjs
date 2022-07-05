@@ -1,13 +1,14 @@
+import { Type } from 'class-transformer';
 import {
   BaseEntity,
   Column,
-  CreateDateColumn,
-  DeleteDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
-  UpdateDateColumn,
 } from 'typeorm';
+import { Board } from './board.entity';
+import { User } from './user.entity';
 
 @Entity({ name: 'scraps' })
 @Unique(['id'])
@@ -20,4 +21,7 @@ export class Scrap extends BaseEntity {
 
   @Column({ type: 'varchar', comment: 'commenter' })
   userId: string;
+
+  @ManyToOne((type) => Board, (board) => board.scrap)
+  board: Board;
 }

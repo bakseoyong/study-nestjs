@@ -10,7 +10,10 @@ import { Comment } from 'src/entity/comment.entity';
 
 @EntityRepository(Comment) //@EntityRepository deprecated in typeorm@^0.3.6
 export class CommentRepository extends Repository<Comment> {
-  async createComment(createCommentDto: CreateCommentDto): Promise<boolean> {
+  async createComment(
+    @TransactionManager() transactionManager: EntityManager,
+    createCommentDto: CreateCommentDto,
+  ): Promise<boolean> {
     try {
       const { boardId, content, commenter } = createCommentDto;
       const comment = await this.save({ boardId, content, commenter });

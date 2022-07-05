@@ -15,6 +15,7 @@ import {
   TransactionManager,
 } from 'typeorm';
 import { PaginationBoardDto } from 'src/board/dto/pagination-boards.dto';
+import { Scrap } from 'src/entity/scrap.entity';
 
 @EntityRepository(Board) //@EntityRepository deprecated in typeorm@^0.3.6
 export class BoardRepository extends Repository<Board> {
@@ -217,5 +218,54 @@ export class BoardRepository extends Repository<Board> {
       },
     });
     // return [];
+  }
+
+  async createComment(
+    @TransactionManager() transactionManager: EntityManager,
+    id: number,
+  ): Promise<boolean> {
+    try {
+      await transactionManager.update(Board, id, {
+        comments: () => 'comments + 1',
+      });
+
+      return true;
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: 'SQL Error',
+          error: error.sqlMessage,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
+  async createScrap(
+    @TransactionManager() transactionManager: EntityManager,
+    id: number,
+    scrap: Scrap,
+  ): Promise<Board> {
+    try {
+      const board = await transactionManager.findOne(Board, id, {
+        relations: ['scrap'],
+      });
+
+      board.scrap.push(scrap);
+
+      await transactionManager.update(Board, id, {
+        scraps: () => 'scraps + 1',
+      });
+
+      return await transactionManager.save(board);
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: 'SQL Error',
+          error: error.sqlMessage,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
   }
 }
