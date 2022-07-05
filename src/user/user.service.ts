@@ -31,4 +31,8 @@ export class UserService {
   followUser(followId: string, follower: string): Promise<boolean> {
     return this.userRepository.followUser(followId, follower);
   }
+
+  unfollowUser(followId: string, follower: string): Promise<boolean> {
+    return this.userRepository.unfollowUser(followId, follower);
+  }
 }

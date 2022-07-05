@@ -57,6 +57,12 @@ export class UserController {
   @Get('/follow-user/:id')
   @UseGuards(JwtAuthGuard)
   followUser(@Param() param, @Req() req): Promise<boolean> {
-    return this.userService.followUser(param.id, req.user.id);
+    return this.userService.followUser(param.id, req.user.no);
+  }
+
+  @Get('/unfollow-user/:id')
+  @UseGuards(JwtAuthGuard)
+  unfollowUser(@Param() param, @Req() req): Promise<boolean> {
+    return this.userService.unfollowUser(param.id, req.user.no);
   }
 }

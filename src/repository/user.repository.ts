@@ -127,4 +127,17 @@ export class UserRepository extends Repository<User> {
 
     return true;
   }
+
+  async unfollowUser(followId: string, follower: string): Promise<boolean> {
+    const user1 = await this.findOne(followId, {
+      relations: ['following'],
+    });
+    const user2 = await this.findOne(follower, {
+      relations: ['follower'],
+    });
+    delete user1[user1.following.findIndex((user) => user === user2)];
+    delete user2[user2.follower.findIndex((user) => user === user1)];
+
+    return true;
+  }
 }
