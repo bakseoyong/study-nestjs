@@ -125,7 +125,7 @@ export class BoardController {
   @Get('/my-scrap-boards')
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
-  getScrapBoardsFindByUserId(@Req() req): Promise<Board[]> {
+  getScrapBoardsFindByUserId(@Req() req): Promise<any> {
     return this.boardService.getScrapBoardsFindByUserId(req.user.no);
   }
 }

@@ -1,7 +1,5 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { Socket } from 'socket.io';
+import { Injectable, Logger } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
-import { Scrap } from 'src/entity/scrap.entity';
 import { BoardRepository } from 'src/repository/board.repository';
 import { CommentRepository } from 'src/repository/comment.repository';
 import { RecommendRepository } from 'src/repository/recommend.repository';
@@ -168,7 +166,6 @@ export class BoardService {
     }
   }
 
-  //스크랩한 게시물들의 내용 ( scraps + boards )
   async getScrapBoardsFindByUserId(userId: string): Promise<any> {
     // const queryRunner = await getConnection().createQueryRunner();
     // await queryRunner.startTransaction();

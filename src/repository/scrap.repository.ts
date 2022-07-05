@@ -34,24 +34,12 @@ export class ScrapRepository extends Repository<Scrap> {
 
   async findScrapsByUserId(userId: string): Promise<any> {
     try {
-      const boards = await getConnection()
-        .createQueryBuilder()
-        .select([])
-        .from(Board, 'boards')
-        .from(Scrap, 'scraps')
-        // Not where !
-        .having('cursorr < :cursorr', { cursorr: cursor })
-        .orderBy('likes', 'DESC')
-        .orderBy('id', 'DESC')
-        .take(paginationBoardDto.limit);
+      const scraps = await this.find({
+        where: { userId: userId },
+        relations: ['board'],
+      });
 
-      return await boards.execute();
-      // const scraps = await this.find({
-      //   where: { userId: userId },
-      //   relations: ['board'],
-      // });
-
-      // return scraps;
+      return scraps;
     } catch (error) {
       Logger.log(error);
       throw new HttpException(
