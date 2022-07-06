@@ -9,6 +9,7 @@ import {
   UseGuards,
   Req,
   Query,
+  Render,
 } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
 import { CreateBoardDto } from './dto/create-board.dto';

@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { BoardModule } from './board/board.module';
 import { EventsGateway } from './events/gateway';
+import { SseModule } from './sse/sse.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { EventsGateway } from './events/gateway';
     UserModule,
     AuthModule,
     BoardModule,
+    SseModule,
   ],
   controllers: [],
   providers: [EventsGateway],

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button id="login_btn">로그인 버튼</button>
+  </body>
+</html>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script>
+  var token =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJubyI6IjMxZmI1NjI5LTc4ZTYtNGQ3Mi1iZTQ4LTJkMjNlYWJlMzJkNSIsInJvbGUiOiJNRU1FQkVSIiwiaWQiOiJiYWtzZW95b25nIiwiZW1haWwiOiJxd2Vya2R1ZDE5OTlAbmF2ZXIuY29tIiwicGhvbmUiOm51bGwsImNyZWF0ZWQiOiIyMDIyLTA2LTI1VDA2OjUxOjQ0LjI1MloiLCJ1cGRhdGVkIjoiMjAyMi0wNi0yNVQwNjo1MTo0NC4yNTJaIiwiZGVsZXRlZCI6bnVsbCwiaWF0IjoxNjU3MDg2NTk1LCJleHAiOjE2NTcwODgzOTV9.9WCFf5_cKTAwui2HpRq8eItAiQcrhyLoMwfiWEMFvUA';
+  let subscribeUrl = 'http://localhost:3000/sse';
+
+  $(function () {
+    $('#login_btn').on('click', loginBtn);
+  });
+
+  function loginBtn() {
+    $.ajax({
+      url: `/sse/login`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      method: 'GET',
+      dataType: 'text',
+      success: function (data, status) {
+        let eventSource = new EventSource(`${subscribeUrl}?userId=${data}`);
+
+        eventSource.addEventListener('sse', function (event) {
+          const data = JSON.parse(event.data);
+
+          async () => {
+            const showNotification = () => {
+              const notification = new Notification('Test', {
+                body: data.content,
+              });
+            };
+
+            setTimeout(() => {
+              notification.close();
+            }, 10 * 1000);
+
+            notification.addEventListener('click', () => {
+              window.open(data.url, '_blank');
+            });
+          };
+        });
+      },
+      error: function (status, error) {
+        console.log(error, status);
+      },
+    });
+  }
+</script>
