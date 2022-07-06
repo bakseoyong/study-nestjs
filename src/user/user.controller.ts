@@ -65,4 +65,9 @@ export class UserController {
   unfollowUser(@Param() param, @Req() req): Promise<boolean> {
     return this.userService.unfollowUser(param.id, req.user.no);
   }
+
+  @Get('/followers/:id')
+  getFollowers(@Param() param): Promise<User[]> {
+    return this.userService.getFollowers(param.id);
+  }
 }

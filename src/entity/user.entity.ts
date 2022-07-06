@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinTable,
   ManyToMany,
   PrimaryGeneratedColumn,
   Unique,
@@ -62,8 +63,10 @@ export class User extends BaseEntity {
   deleted: Date;
 
   @ManyToMany((type) => User, (user) => user.follower)
+  @JoinTable()
   following: User[];
 
   @ManyToMany((type) => User, (user) => user.following)
+  @JoinTable()
   follower: User[];
 }

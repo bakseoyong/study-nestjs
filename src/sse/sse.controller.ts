@@ -15,6 +15,6 @@ export class SseController {
     return req.user.no;
   }
 
-  @Sse('/subscribe')
-  subscribe();
+  // @Sse('/subscribe')
+  // subscribe();
 }

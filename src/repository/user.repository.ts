@@ -2,6 +2,7 @@ import {
   ForbiddenException,
   HttpException,
   HttpStatus,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -139,5 +140,26 @@ export class UserRepository extends Repository<User> {
     delete user2[user2.follower.findIndex((user) => user === user1)];
 
     return true;
+  }
+
+  async getFollowers(userId: string): Promise<User[]> {
+    Logger.log(userId);
+    try {
+      const users = await this.find({
+        relations: ['follower'],
+        where: { no: userId },
+      });
+
+      return users;
+    } catch (error) {
+      Logger.log(error);
+      throw new HttpException(
+        {
+          message: 'SQL Error',
+          error: error.sqlMessage,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
   }
 }
