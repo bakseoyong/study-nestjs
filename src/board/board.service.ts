@@ -49,7 +49,8 @@ export class BoardService {
   }
 
   createBoard(createBoardDto: CreateBoardDto): Promise<boolean> {
-    return this.boardRepository.createBoard(createBoardDto);
+    //return this.boardRepository.createBoard(createBoardDto);
+    //this.userRepository.getFollowers(createBoardDto)
   }
 
   setAuthorUndefined(userId: string): Promise<boolean> {

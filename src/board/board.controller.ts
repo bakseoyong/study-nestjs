@@ -9,7 +9,6 @@ import {
   UseGuards,
   Req,
   Query,
-  Render,
 } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
 import { CreateBoardDto } from './dto/create-board.dto';
@@ -33,7 +32,15 @@ export class BoardController {
   @Post('/create-board')
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
-  createBoard(@Body() createBoardDto: CreateBoardDto): Promise<boolean> {
+  //createBoard(@Body() createBoardDto: CreateBoardDto): Promise<boolean> {
+  //return this.boardService.createBoard(createBoardDto);
+  createBoard(@Body() body, @Req() req): Promise<boolean> {
+    const createBoardDto: CreateBoardDto = {
+      title: body.title,
+      content: body.content,
+      author: req.user.no,
+    };
+
     return this.boardService.createBoard(createBoardDto);
   }
 

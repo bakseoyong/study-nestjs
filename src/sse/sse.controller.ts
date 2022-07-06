@@ -1,4 +1,4 @@
-import { Controller, Get, Render, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Render, Req, Sse, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('sse')
@@ -14,4 +14,7 @@ export class SseController {
   sseLogin(@Req() req): any {
     return req.user.no;
   }
+
+  @Sse('/subscribe')
+  subscribe();
 }
