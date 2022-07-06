@@ -143,7 +143,6 @@ export class UserRepository extends Repository<User> {
   }
 
   async getFollowers(userId: string): Promise<User[]> {
-    Logger.log(userId);
     try {
       const users = await this.find({
         relations: ['follower'],
@@ -152,7 +151,6 @@ export class UserRepository extends Repository<User> {
 
       return users;
     } catch (error) {
-      Logger.log(error);
       throw new HttpException(
         {
           message: 'SQL Error',

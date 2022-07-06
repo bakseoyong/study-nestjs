@@ -9,6 +9,7 @@ import {
   UseGuards,
   Req,
   Query,
+  Logger,
 } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
 import { CreateBoardDto } from './dto/create-board.dto';
@@ -18,10 +19,15 @@ import { PaginationBoardDto } from './dto/pagination-boards.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { InitViewDto } from './dto/init-view.dto';
 import { ScrapBoardDto } from './dto/scrap-board.dto';
+import { HttpService } from '@nestjs/axios';
+import { map, Observable } from 'rxjs';
 
 @Controller('board')
 export class BoardController {
-  constructor(private readonly boardService: BoardService) {}
+  constructor(
+    private readonly boardService: BoardService,
+    private readonly httpService: HttpService,
+  ) {}
 
   @Get('/view/:id')
   //@Render('view.ejs')
@@ -34,14 +40,25 @@ export class BoardController {
   @UsePipes(ValidationPipe)
   //createBoard(@Body() createBoardDto: CreateBoardDto): Promise<boolean> {
   //return this.boardService.createBoard(createBoardDto);
-  createBoard(@Body() body, @Req() req): Promise<boolean> {
+  async createBoard(@Body() body, @Req() req): Promise<any> {
     const createBoardDto: CreateBoardDto = {
       title: body.title,
       content: body.content,
       author: req.user.no,
     };
 
-    return this.boardService.createBoard(createBoardDto);
+    const result = await this.boardService.createBoard(createBoardDto);
+
+    //Observable<AxiosResponse<Object[]>>
+    const author = await this.httpService.get(
+      `http://localhost:3000/user/followers/${req.user.no}`,
+    );
+
+    const followers = author.pipe(map((response) => response.data))[0].follower;
+    //follower들에게 sse 보내면된다!
+    //this.httpService.get(`http://localhost:3000/sse/send-notification`);
+
+    //return result;
   }
 
   // @Post('/create-auth-board')

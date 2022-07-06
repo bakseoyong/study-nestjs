@@ -1,3 +1,4 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BoardRepository } from 'src/repository/board.repository';
@@ -10,6 +11,7 @@ import { BoardService } from './board.service';
 
 @Module({
   imports: [
+    HttpModule,
     TypeOrmModule.forFeature([
       BoardRepository,
       RecommendRepository,

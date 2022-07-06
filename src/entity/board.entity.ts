@@ -9,7 +9,6 @@ import {
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
-import { Comment } from './comment.entity';
 import { Scrap } from './scrap.entity';
 
 @Entity({ name: 'boards' })
@@ -27,7 +26,7 @@ export class Board extends BaseEntity {
   @Column({ type: 'integer', default: 0, comment: 'num of comments' })
   comments: number;
 
-  @Column({ type: 'integer', comment: 'num of scraps' })
+  @Column({ type: 'integer', default: 0, comment: 'num of scraps' })
   scraps: number;
 
   @Column({ type: 'varchar', comment: 'Title' })
