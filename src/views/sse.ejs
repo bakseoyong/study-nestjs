@@ -12,17 +12,33 @@
 </html>
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 <script>
+  const eventSource = new EventSource('/sse/alarm');
+
+  eventSource.onopen = function () {
+    console.log('연결');
+  };
+
+  eventSource.onmessage = ({ data }) => {
+    // const message = document.querySelector('li');
+    // message.innerText = data;
+    // document.body.appendChild(message);
+    console.log(data);
+  };
+</script>
+
+<!-- <script>
   var token =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJubyI6IjMxZmI1NjI5LTc4ZTYtNGQ3Mi1iZTQ4LTJkMjNlYWJlMzJkNSIsInJvbGUiOiJNRU1FQkVSIiwiaWQiOiJiYWtzZW95b25nIiwiZW1haWwiOiJxd2Vya2R1ZDE5OTlAbmF2ZXIuY29tIiwicGhvbmUiOm51bGwsImNyZWF0ZWQiOiIyMDIyLTA2LTI1VDA2OjUxOjQ0LjI1MloiLCJ1cGRhdGVkIjoiMjAyMi0wNi0yNVQwNjo1MTo0NC4yNTJaIiwiZGVsZXRlZCI6bnVsbCwiaWF0IjoxNjU3MDg2NTk1LCJleHAiOjE2NTcwODgzOTV9.9WCFf5_cKTAwui2HpRq8eItAiQcrhyLoMwfiWEMFvUA';
-  let subscribeUrl = 'http://localhost:3000/sse/subscribe';
+  let subscribeUrl = 'http://localhost:3000/sse/alarm';
 
   $(function () {
     $('#login_btn').on('click', loginBtn);
   });
 
+  //로그인 버튼 누르기 -> 이벤트소스 접속
   function loginBtn() {
     $.ajax({
-      url: `/sse/login`,
+      url: `/sse/sse-noti-test`,
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -56,4 +72,4 @@
       },
     });
   }
-</script>
+</script> -->

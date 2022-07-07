@@ -9,7 +9,6 @@ import {
   UseGuards,
   Req,
   Query,
-  Logger,
 } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
 import { CreateBoardDto } from './dto/create-board.dto';
@@ -20,7 +19,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { InitViewDto } from './dto/init-view.dto';
 import { ScrapBoardDto } from './dto/scrap-board.dto';
 import { HttpService } from '@nestjs/axios';
-import { map, Observable } from 'rxjs';
+import { map } from 'rxjs';
 
 @Controller('board')
 export class BoardController {
@@ -55,7 +54,8 @@ export class BoardController {
     );
 
     const followers = author.pipe(map((response) => response.data))[0].follower;
-    //follower들에게 sse 보내면된다!
+
+    //follower들에게 sse 보내면된다
     //this.httpService.get(`http://localhost:3000/sse/send-notification`);
 
     //return result;
