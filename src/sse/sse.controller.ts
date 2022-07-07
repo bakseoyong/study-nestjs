@@ -1,22 +1,40 @@
-import { Controller, Get, Render, Req, Sse, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Logger,
+  Render,
+  Req,
+  Sse,
+  UseGuards,
+} from '@nestjs/common';
 import { interval, map, Observable, of, ReplaySubject } from 'rxjs';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { EventEmitter } from 'stream';
 import { SseService } from './sse.service';
-
-interface MessageEvent {
-  type: string;
-  message: string;
-}
 
 @Controller('sse')
 export class SseController {
   constructor(private readonly sseService: SseService) {}
+  data: number[];
 
   @Get()
   @Render('sse.ejs')
   testSse(): void {
     const test = 1;
+  }
+
+  @Get('/new-event')
+  newEvent(): void {
+    this.sendAlarm(
+      new Observable((subscriber) => {
+        subscriber.next(1);
+        subscriber.next(2);
+        subscriber.next(3);
+        setTimeout(() => {
+          subscriber.next(4);
+          subscriber.complete();
+        }, 1000);
+      }),
+    );
   }
 
   @Get('/login')
@@ -38,9 +56,8 @@ export class SseController {
   // }
 
   @Sse('alarm')
-  sendAlarm(): Observable<any> {
-    const subject = new ReplaySubject();
-    const observer = subject.asObservable();
+  sendAlarm(a: Observable<any>): Observable<any> {
+    //이벤트 모아놓은 스택 만들어서 어떻게 하기
 
     // return observer.pipe(
     //   map((num: number) => ({
@@ -56,28 +73,28 @@ export class SseController {
     // );
     // this.sseService.emit({ a: 1, b: 2 });
     // return true;
-    // const observable = new Observable((subscriber) => {
-    //   // subscriber.next(1);
-    //   // subscriber.next(2);
-    //   // subscriber.next(3);
-    //   setTimeout(() => {
-    //     subscriber.next(4);
-    //     subscriber.complete();
-    //   }, 1000);
-    // });
-    // return;
-    return new Observable((subscriber) => {
+    const observable = new Observable((subscriber) => {
       subscriber.next(1);
       subscriber.next(2);
-      subscriber.complete();
-    }).pipe(
-      map((num: number) => ({
-        data: 'hello' + num,
-      })),
-    );
+      subscriber.next(3);
+      setTimeout(() => {
+        subscriber.next(4);
+        subscriber.complete();
+      }, 1000);
+    });
+    return observable;
+    // return;
+    // Logger.log(this.data);
+    // return new Observable((subscriber) => {
+    //   this.data.forEach((index) => {
+    //     subscriber.next(index);
+    //   });
+    //   subscriber.complete();
+    // }).pipe(
+    //   map((num: number) => ({
+    //     data: 'hello' + num,
+    //   })),
+    // );
     // return observable;
   }
-
-  // @Sse('/subscribe')
-  // subscribe();
 }

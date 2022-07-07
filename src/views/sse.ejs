@@ -14,7 +14,7 @@
 <script>
   const eventSource = new EventSource('/sse/alarm');
 
-  eventSource.onopen = ({ data }) => {
+  eventSource.onopen = () => {
     console.log('연결');
   };
 
@@ -24,6 +24,23 @@
     // document.body.appendChild(message);
     console.log(data);
   };
+
+  eventSource.onerror = (data) => {
+    console.log(event);
+  };
+
+  // eventSource.addEventListener('error', (e) => {
+  //   console.log(e);
+  // });
+
+  $(eventSource).on('noti', (event) => {
+    //do something
+    console.log(event);
+  });
+
+  // eventSource.addEventListener('noti', function (event) {
+  //   console.log(event);
+  // });
 
   eventSource.close = function () {
     console.log('해제');
