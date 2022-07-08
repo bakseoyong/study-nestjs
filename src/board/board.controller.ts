@@ -46,7 +46,7 @@ export class BoardController {
       author: req.user.no,
     };
 
-    const result = await this.boardService.createBoard(createBoardDto);
+    const board = await this.boardService.createBoard(createBoardDto);
 
     //Observable<AxiosResponse<Object[]>>
     const author = await this.httpService.get(
@@ -55,19 +55,29 @@ export class BoardController {
 
     const followers = author.pipe(map((response) => response.data))[0].follower;
 
+    const data = {
+      followers: followers,
+      url: `http://localhost:3000/board/view/${board.id}`,
+      creator: board.author,
+    }
+
+    await this.httpService.post(
+      `http://localhost:3000/notification/following-new-board`,
+      data
+    )
+
+    //noti를 만들고 => service계층에서 notiRepository에 noti 작성
+    notiService => 
+    notiRepository에 저장되어있는데 
+    사용자들은 페이지가 새로고침되었을때 새로 작성된 알림들을 볼 수 있도록 해야된다
+    최신순이 위에 올라오게
+    쿠키 사용없이 해보자
+    
     //follower들에게 sse 보내면된다
     //this.httpService.get(`http://localhost:3000/sse/send-notification`);
 
     //return result;
   }
-
-  // @Post('/create-auth-board')
-  // @UsePipes(ValidationPipe)
-  // createAuthBoard(
-  //   @Body() createAuthBoardDto: CreateAuthBoardDto,
-  // ): Promise<boolean> {
-  //   return this.boardService.createAuthBoard(createAuthBoardDto);
-  // }
 
   @Get('/author-undefined/:id')
   @UsePipes(ValidationPipe)

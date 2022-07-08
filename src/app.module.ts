@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { BoardModule } from './board/board.module';
 import { EventsGateway } from './events/gateway';
 import { SseModule } from './sse/sse.module';
+import { NotificationController } from './notification/notification.controller';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -14,8 +16,9 @@ import { SseModule } from './sse/sse.module';
     AuthModule,
     BoardModule,
     SseModule,
+    NotificationModule,
   ],
-  controllers: [],
+  controllers: [NotificationController],
   providers: [EventsGateway],
 })
 export class AppModule {}

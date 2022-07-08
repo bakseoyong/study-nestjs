@@ -48,7 +48,7 @@ export class BoardService {
     }
   }
 
-  createBoard(createBoardDto: CreateBoardDto): Promise<boolean> {
+  createBoard(createBoardDto: CreateBoardDto): Promise<Board> {
     return this.boardRepository.createBoard(createBoardDto);
   }
 
@@ -65,7 +65,7 @@ export class BoardService {
     await queryRunner.startTransaction();
 
     try {
-      await this.recommendRepository.createRecommend(
+      this.recommendRepository.createRecommend(
         queryRunner.manager,
         id,
         recommender,

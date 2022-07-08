@@ -44,11 +44,12 @@ export class BoardRepository extends Repository<Board> {
     }
   }
 
-  async createBoard(createBoardDto: CreateBoardDto): Promise<boolean> {
+  async createBoard(createBoardDto: CreateBoardDto): Promise<Board> {
     try {
-      const board = await this.insert(createBoardDto);
+      //this.insert() return Promoise<InsertResult>
+      const board = await this.save(createBoardDto);
 
-      return board ? true : false;
+      return board;
     } catch (error) {
       throw new HttpException(
         {
