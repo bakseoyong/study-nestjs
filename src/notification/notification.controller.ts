@@ -1,4 +1,14 @@
-import { Body, Controller, Logger, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Logger,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { Notification } from 'src/entity/notification.entity';
 import { CreateNotiDto } from './dto/create-noti.dto';
 import { NewBoardNotiToFollowersDto } from './dto/new-board-noti-to-followers.dto';
 import { NotificationService } from './notification.service';
@@ -25,5 +35,11 @@ export class NotificationController {
   @Post('/create')
   createNoti(@Body() createNotiDto: CreateNotiDto): Promise<boolean> {
     return this.notificationService.createNoti(createNotiDto);
+  }
+
+  @Get('/get-notifications')
+  @UseGuards(JwtAuthGuard)
+  getNotifications(@Req() req): Promise<Notification[]> {
+    return this.notificationService.getNotifications(req.user.no);
   }
 }

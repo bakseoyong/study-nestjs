@@ -43,6 +43,6 @@ export class Notification extends BaseEntity {
   @CreateDateColumn()
   created: Date;
 
-  @Column({ type: 'date', comment: 'checked date' })
-  checked: Date;
+  @Column({ type: 'boolean', comment: 'checked true / false' })
+  checked: boolean;
 }

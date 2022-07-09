@@ -81,4 +81,22 @@ export class NotificationRepository extends Repository<Notification> {
       );
     }
   }
+
+  async getNotifications(userId: string): Promise<Notification[]> {
+    try {
+      const notifications = await this.find({
+        where: { receiver: userId },
+        order: { created: 'DESC' },
+      });
+      return notifications;
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: 'SQL Error',
+          error: error.sqlMessage,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
 }
