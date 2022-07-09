@@ -20,6 +20,7 @@ import { InitViewDto } from './dto/init-view.dto';
 import { ScrapBoardDto } from './dto/scrap-board.dto';
 import { HttpService } from '@nestjs/axios';
 import { map } from 'rxjs';
+import { NotificationType } from 'src/entity/notification.entity';
 
 @Controller('board')
 export class BoardController {
@@ -59,24 +60,12 @@ export class BoardController {
       followers: followers,
       url: `http://localhost:3000/board/view/${board.id}`,
       creator: board.author,
-    }
+    };
 
     await this.httpService.post(
       `http://localhost:3000/notification/following-new-board`,
-      data
-    )
-
-    //noti를 만들고 => service계층에서 notiRepository에 noti 작성
-    notiService => 
-    notiRepository에 저장되어있는데 
-    사용자들은 페이지가 새로고침되었을때 새로 작성된 알림들을 볼 수 있도록 해야된다
-    최신순이 위에 올라오게
-    쿠키 사용없이 해보자
-    
-    //follower들에게 sse 보내면된다
-    //this.httpService.get(`http://localhost:3000/sse/send-notification`);
-
-    //return result;
+      data,
+    );
   }
 
   @Get('/author-undefined/:id')
@@ -137,13 +126,31 @@ export class BoardController {
   @Post('/create-comment/:id')
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
-  createComment(@Param() param, @Body() data, @Req() req): Promise<boolean> {
+  async createComment(
+    @Param() param,
+    @Body() data,
+    @Req() req,
+  ): Promise<boolean> {
     const createCommentDto: CreateCommentDto = {
       boardId: param.id,
       content: data.content,
       commenter: req.user.no,
     };
-    return this.boardService.createComment(createCommentDto);
+    await this.boardService.createComment(createCommentDto);
+
+    const notiData = {
+      //createComment가 board를 리턴하는게 이상하지. boardId로 유저 정보 가져오게 하자
+      receivers: await this.boardService.getAuthorById(param.id),
+      url: `http://localhost:3000/view/board/${param.id}`,
+      creator: req.user.no,
+      notiType: NotificationType.WRITE_BOARD_COMMENT,
+    };
+
+    //글 작성자에게 알림
+    await this.httpService.post(
+      `http://localhost:3000/notification/create`,
+      notiData,
+    );
   }
 
   @Get('/scrap-board/:id')

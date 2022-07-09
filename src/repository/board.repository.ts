@@ -16,6 +16,7 @@ import {
 } from 'typeorm';
 import { PaginationBoardDto } from 'src/board/dto/pagination-boards.dto';
 import { Scrap } from 'src/entity/scrap.entity';
+import { User } from 'src/entity/user.entity';
 
 @EntityRepository(Board) //@EntityRepository deprecated in typeorm@^0.3.6
 export class BoardRepository extends Repository<Board> {
@@ -259,6 +260,23 @@ export class BoardRepository extends Repository<Board> {
       });
 
       return await transactionManager.save(board);
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: 'SQL Error',
+          error: error.sqlMessage,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
+  async getAuthorById(boardId: string): Promise<string> {
+    try {
+      const board = await this.findOne({
+        where: { id: boardId },
+      });
+      return board ? board.author : null;
     } catch (error) {
       throw new HttpException(
         {

@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
+import { User } from 'src/entity/user.entity';
 import { BoardRepository } from 'src/repository/board.repository';
 import { CommentRepository } from 'src/repository/comment.repository';
 import { RecommendRepository } from 'src/repository/recommend.repository';
@@ -166,7 +167,7 @@ export class BoardService {
     }
   }
 
-  async getScrapBoardsFindByUserId(userId: string): Promise<any> {
+  getScrapBoardsFindByUserId(userId: string): Promise<any> {
     // const queryRunner = await getConnection().createQueryRunner();
     // await queryRunner.startTransaction();
 
@@ -176,5 +177,9 @@ export class BoardService {
     //   await queryRunner.rollbackTransaction();
     //   Logger.log(error);
     // }
+  }
+
+  getAuthorById(boardId: string): Promise<string> {
+    return this.boardRepository.getAuthorById(boardId);
   }
 }
