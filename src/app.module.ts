@@ -18,7 +18,7 @@ import { NotificationModule } from './notification/notification.module';
     SseModule,
     NotificationModule,
   ],
-  controllers: [NotificationController],
+  controllers: [],
   providers: [EventsGateway],
 })
 export class AppModule {}

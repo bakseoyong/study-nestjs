@@ -104,6 +104,7 @@ export class UserRepository extends Repository<User> {
         throw new UnauthorizedException('incorrect Password');
       }
     } catch (error) {
+      Logger.log(error);
       throw new HttpException(
         {
           message: 'SQL Error',

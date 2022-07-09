@@ -151,6 +151,8 @@ export class BoardController {
       `http://localhost:3000/notification/create`,
       notiData,
     );
+
+    return true;
   }
 
   @Get('/scrap-board/:id')

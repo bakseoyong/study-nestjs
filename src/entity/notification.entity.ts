@@ -24,9 +24,10 @@ export class Notification extends BaseEntity {
   //알림 타입(작성한 게시글에 댓글 작성, 작성한 게시글에 좋아요, 팔로워한 유저의 새글 올림,
   //내가 작성한 댓글에 좋아요, 내가 작성한 댓글에 댓글)
   @Column({
+    type: 'enum',
     enum: NotificationType,
   })
-  notiType: number;
+  notiType: NotificationType;
 
   @Column({ type: 'varchar', comment: 'alarm receiver' })
   receiver: string;
