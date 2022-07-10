@@ -70,6 +70,12 @@ export class BoardController {
 
     const board = await this.boardService.createBoard(createBoardDto);
 
+    //board - hashtag
+    await this.httpService.post(
+      `http://localhost:3000/hashtag/create-board-hashtag`,
+      { board, hashtags },
+    );
+
     //Observable<AxiosResponse<Object[]>>
     const author = await this.httpService.get(
       `http://localhost:3000/user/followers/${req.user.no}`,

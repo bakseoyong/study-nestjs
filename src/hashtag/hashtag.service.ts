@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { Hashtag } from 'src/entity/hashtag.entity';
+import { BoardHashtagRepository } from 'src/repository/board-hashtag.repository';
 import { HashtagRepository } from 'src/repository/hashtag.repository';
 
 @Injectable()
 export class HashtagService {
-  constructor(private readonly hashtagRepository: HashtagRepository) {}
+  constructor(
+    private readonly hashtagRepository: HashtagRepository,
+    private readonly boardHashtagRepository: BoardHashtagRepository,
+  ) {}
 
   async findOrCreateHashtags(tagNames: string[]): Promise<Hashtag[]> {
     const hashtags: Hashtag[] = [];
@@ -21,5 +25,9 @@ export class HashtagService {
       hashtags.push(hashtag);
     }
     return hashtags;
+  }
+
+  createBoardHashtag(body): Promise<boolean> {
+    return this.boardHashtagRepository.createBoardHashtag(body);
   }
 }

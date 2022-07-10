@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Logger, Param } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
 import { Hashtag } from 'src/entity/hashtag.entity';
 import { HashtagService } from './hashtag.service';
 
@@ -6,8 +6,13 @@ import { HashtagService } from './hashtag.service';
 export class HashtagController {
   constructor(private readonly hashtagService: HashtagService) {}
 
-  @Get('/find-or-create')
+  @Post('/find-or-create')
   findOrCreateHashtags(@Body() body): Promise<Hashtag[]> {
     return this.hashtagService.findOrCreateHashtags(body.tagNames);
+  }
+
+  @Post('/create-board-hashtag')
+  createBoardHashtag(@Body() body): Promise<boolean> {
+    return this.hashtagService.createBoardHashtag(body);
   }
 }
