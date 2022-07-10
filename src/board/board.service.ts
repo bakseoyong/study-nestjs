@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
-import { User } from 'src/entity/user.entity';
 import { BoardRepository } from 'src/repository/board.repository';
 import { CommentRepository } from 'src/repository/comment.repository';
 import { RecommendRepository } from 'src/repository/recommend.repository';

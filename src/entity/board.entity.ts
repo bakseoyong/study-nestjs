@@ -9,6 +9,7 @@ import {
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
+import { BoardHashtag } from './board-hashtag.entity';
 import { Scrap } from './scrap.entity';
 
 @Entity({ name: 'boards' })
@@ -47,4 +48,7 @@ export class Board extends BaseEntity {
   // '/board/my-scrap-board' JOIN
   @OneToMany((type) => Scrap, (scrap) => scrap.board)
   scrap: Scrap[];
+
+  @OneToMany((type) => BoardHashtag, (boardHashtag) => boardHashtag.board)
+  boardHashtag: BoardHashtag[];
 }
