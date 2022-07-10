@@ -30,7 +30,7 @@ export class BoardRepository extends Repository<Board> {
       });
 
       if (!board) {
-        throw new NotFoundException('The post does not exist');
+        throw new NotFoundException('board does not exist');
       }
 
       return board;
