@@ -65,7 +65,7 @@ export class BoardController {
     const createBoardDto: CreateBoardDto = {
       title: body.title,
       content: body.content,
-      author: req.user.no,
+      author: req.user.id,
     };
 
     const board = await this.boardService.createBoard(createBoardDto);
@@ -78,7 +78,7 @@ export class BoardController {
 
     //Observable<AxiosResponse<Object[]>>
     const author = await this.httpService.get(
-      `http://localhost:3000/user/followers/${req.user.no}`,
+      `http://localhost:3000/user/followers/${req.user.id}`,
     );
 
     const followers = author.pipe(map((response) => response.data))[0].follower;
@@ -124,7 +124,7 @@ export class BoardController {
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   recommendBoard(@Param('id') id: number, @Req() req): Promise<number> {
-    return this.boardService.recommendBoard(id, req.user.no);
+    return this.boardService.recommendBoard(id, req.user.id);
   }
 
   @ApiOperation({
@@ -146,7 +146,7 @@ export class BoardController {
   @Get('/report-board/:id')
   @UsePipes(ValidationPipe)
   reportBoard(@Param('id') id: number, @Req() req): Promise<boolean> {
-    return this.boardService.reportBoard(id, req.user.no);
+    return this.boardService.reportBoard(id, req.user.id);
   }
 
   @ApiOperation({
@@ -196,7 +196,7 @@ export class BoardController {
     const createCommentDto: CreateCommentDto = {
       boardId: param.id,
       content: data.content,
-      commenter: req.user.no,
+      commenter: req.user.id,
     };
     await this.boardService.createComment(createCommentDto);
 
@@ -204,7 +204,7 @@ export class BoardController {
       //createComment가 board를 리턴하는게 이상하지. boardId로 유저 정보 가져오게 하자
       receivers: await this.boardService.getAuthorById(param.id),
       url: `http://localhost:3000/view/board/${param.id}`,
-      creator: req.user.no,
+      creator: req.user.id,
       notiType: NotificationType.WRITE_BOARD_COMMENT,
     };
 
@@ -227,7 +227,7 @@ export class BoardController {
   scrapBoard(@Param() param, @Req() req): Promise<boolean> {
     const scrapBoardDto: ScrapBoardDto = {
       boardId: param.id,
-      userId: req.user.no,
+      userId: req.user.id,
     };
     return this.boardService.scrapBoard(scrapBoardDto);
   }
@@ -240,6 +240,6 @@ export class BoardController {
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   getScrapBoardsFindByUserId(@Req() req): Promise<any> {
-    return this.boardService.getScrapBoardsFindByUserId(req.user.no);
+    return this.boardService.getScrapBoardsFindByUserId(req.user.id);
   }
 }

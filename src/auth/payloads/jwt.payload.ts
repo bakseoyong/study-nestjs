@@ -1,6 +1,6 @@
 import { Role } from 'src/entity/user.entity';
 
 export type Payload = {
-  no: string;
+  id: string;
   role: Role;
 };

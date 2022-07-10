@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { Hashtag } from 'src/entity/hashtag.entity';
 import { HashtagService } from './hashtag.service';
 

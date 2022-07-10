@@ -19,10 +19,10 @@ export enum Role {
 }
 
 @Entity({ name: 'users' })
-@Unique(['no'])
+@Unique(['id'])
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  no: string;
+  id: string;
 
   @Column({
     type: 'enum',
@@ -32,7 +32,7 @@ export class User extends BaseEntity {
   role: Role;
 
   @Column({ type: 'varchar', length: 12, unique: true, comment: 'Id' })
-  id: string;
+  uid: string;
 
   @Column({ type: 'varchar', length: 65, comment: 'Password' })
   password: string;

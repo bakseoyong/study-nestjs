@@ -40,6 +40,6 @@ export class NotificationController {
   @Get('/get-notifications')
   @UseGuards(JwtAuthGuard)
   getNotifications(@Req() req): Promise<Notification[]> {
-    return this.notificationService.getNotifications(req.user.no);
+    return this.notificationService.getNotifications(req.user.id);
   }
 }
