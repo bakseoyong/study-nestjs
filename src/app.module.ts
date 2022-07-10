@@ -6,8 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { BoardModule } from './board/board.module';
 import { EventsGateway } from './events/gateway';
 import { SseModule } from './sse/sse.module';
-import { NotificationController } from './notification/notification.controller';
 import { NotificationModule } from './notification/notification.module';
+import { HashtagModule } from './hashtag/hashtag.module';
 
 @Module({
   imports: [
@@ -17,6 +17,7 @@ import { NotificationModule } from './notification/notification.module';
     BoardModule,
     SseModule,
     NotificationModule,
+    HashtagModule,
   ],
   controllers: [],
   providers: [EventsGateway],

@@ -14,8 +14,8 @@ export class Hashtag extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', comment: 'hashtag keyword' })
-  keyword: string;
+  @Column({ type: 'varchar', comment: 'hashtag tagname' })
+  tagName: string;
 
   @OneToMany((type) => BoardHashtag, (boardHashtag) => boardHashtag.hashtag)
   boardHashtag: BoardHashtag;

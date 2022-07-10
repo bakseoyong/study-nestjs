@@ -20,17 +20,19 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { InitViewDto } from './dto/init-view.dto';
 import { ScrapBoardDto } from './dto/scrap-board.dto';
 import { HttpService } from '@nestjs/axios';
+import { AxiosResponse } from 'axios';
 import { map } from 'rxjs';
 import { NotificationType } from 'src/entity/notification.entity';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from 'src/entity/user.entity';
+import { Hashtag } from 'src/entity/hashtag.entity';
 
 @ApiTags('게시글 API')
 @Controller('board')
 export class BoardController {
   constructor(
     private readonly boardService: BoardService,
-    private readonly httpService: HttpService,
+    private readonly httpService: HttpService, //private readonly hashtagService: HashtagService,
   ) {}
 
   @ApiOperation({
@@ -51,9 +53,15 @@ export class BoardController {
   @Post('/create-board')
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
-  //createBoard(@Body() createBoardDto: CreateBoardDto): Promise<boolean> {
-  //return this.boardService.createBoard(createBoardDto);
   async createBoard(@Body() body, @Req() req): Promise<any> {
+    const hashtags: Hashtag[] = await this.httpService
+      .post(`http://localhost:3000/hashtag/find-or-create`, body.tagNames)
+      .pipe(
+        map((axiosResponse: AxiosResponse) => {
+          return axiosResponse.data;
+        }),
+      )[0];
+
     const createBoardDto: CreateBoardDto = {
       title: body.title,
       content: body.content,
