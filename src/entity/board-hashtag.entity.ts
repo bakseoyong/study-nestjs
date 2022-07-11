@@ -15,7 +15,9 @@ export class BoardHashtag extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => Board, (board) => board.boardHashtag)
+  @ManyToOne((type) => Board, (board) => board.boardHashtag, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   board: Board;
 

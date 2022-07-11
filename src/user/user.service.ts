@@ -27,16 +27,4 @@ export class UserService {
   readAllUser(): Promise<User[]> {
     return this.userRepository.readAllUser();
   }
-
-  followUser(followId: string, follower: string): Promise<boolean> {
-    return this.userRepository.followUser(followId, follower);
-  }
-
-  unfollowUser(followId: string, follower: string): Promise<boolean> {
-    return this.userRepository.unfollowUser(followId, follower);
-  }
-
-  getFollowers(userId: string): Promise<User[]> {
-    return this.userRepository.getFollowers(userId);
-  }
 }
