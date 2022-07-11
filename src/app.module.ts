@@ -8,6 +8,8 @@ import { EventsGateway } from './events/gateway';
 import { SseModule } from './sse/sse.module';
 import { NotificationModule } from './notification/notification.module';
 import { HashtagModule } from './hashtag/hashtag.module';
+import { FollowController } from './follow/follow.controller';
+import { FollowModule } from './follow/follow.module';
 
 @Module({
   imports: [
@@ -18,8 +20,9 @@ import { HashtagModule } from './hashtag/hashtag.module';
     SseModule,
     NotificationModule,
     HashtagModule,
+    FollowModule,
   ],
-  controllers: [],
+  controllers: [FollowController],
   providers: [EventsGateway],
 })
 export class AppModule {}

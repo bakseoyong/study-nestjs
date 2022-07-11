@@ -6,10 +6,12 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
+import { Follow } from './follow.entity';
 
 export enum Role {
   ADMIN = 'ADMIN',
@@ -62,11 +64,17 @@ export class User extends BaseEntity {
   @DeleteDateColumn({ name: 'deleted', comment: 'Deleted Date' })
   deleted: Date;
 
-  @ManyToMany((type) => User, (user) => user.follower)
-  @JoinTable()
-  following: User[];
+  // @ManyToMany((type) => User, (user) => user.follower)
+  // @JoinTable()
+  // following: User[];
 
-  @ManyToMany((type) => User, (user) => user.following)
-  @JoinTable()
-  follower: User[];
+  @OneToMany((type) => Follow, (follow) => follow.to)
+  followings: Follow[];
+
+  @OneToMany((type) => Follow, (follow) => follow.from)
+  followers: Follow[];
+
+  // @ManyToMany((type) => User, (user) => user.following)
+  // @JoinTable()
+  // follower: User[];
 }

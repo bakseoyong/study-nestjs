@@ -46,7 +46,9 @@ export class UserController {
   @Delete('/delete-user-by-role')
   @Roles([Role.ADMIN, Role.MANAGER])
   @UsePipes(ValidationPipe)
-  deleteUserByRole();
+  deleteUserByRole(id: string): Promise<boolean> {
+    return this.userService.deleteUser(id);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Get('/read-all-user')
@@ -59,22 +61,5 @@ export class UserController {
   @Post('/auth-login')
   login(@Request() req) {
     return req.user;
-  }
-
-  @Get('/follow-user/:id')
-  @UseGuards(JwtAuthGuard)
-  followUser(@Param() param, @Req() req): Promise<boolean> {
-    return this.userService.followUser(param.id, req.user.id);
-  }
-
-  @Get('/unfollow-user/:id')
-  @UseGuards(JwtAuthGuard)
-  unfollowUser(@Param() param, @Req() req): Promise<boolean> {
-    return this.userService.unfollowUser(param.id, req.user.id);
-  }
-
-  @Get('/followers/:id')
-  getFollowers(@Param() param): Promise<User[]> {
-    return this.userService.getFollowers(param.id);
   }
 }
