@@ -22,6 +22,6 @@ export class Scrap extends BaseEntity {
   @Column({ type: 'varchar', comment: 'commenter' })
   userId: string;
 
-  @ManyToOne((type) => Board, (board) => board.scrap)
-  board: Board;
+  // @ManyToOne((type) => Board, (board) => board.scrap)
+  // board: Board;
 }

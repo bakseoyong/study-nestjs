@@ -6,6 +6,7 @@ import { IoAdapter } from '@nestjs/platform-socket.io';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Observable } from 'rxjs';
+import express from 'express';
 
 async function bootstrap() {
   //const app = await NestFactory.create(AppModule);
@@ -45,6 +46,9 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'src', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'src', 'views'));
   app.setViewEngine('ejs');
+
+  //Multer
+  app.use('/public', express.static(join(__dirname, '../public')));
 
   await app.listen(3000);
 }

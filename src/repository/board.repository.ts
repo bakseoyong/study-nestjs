@@ -253,7 +253,7 @@ export class BoardRepository extends Repository<Board> {
         relations: ['scrap'],
       });
 
-      board.scrap.push(scrap);
+      //board.scrap.push(scrap);
 
       await transactionManager.update(Board, id, {
         scraps: () => 'scraps + 1',
