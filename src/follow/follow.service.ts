@@ -6,11 +6,11 @@ import { FollowRepository } from 'src/repository/follow.repository';
 export class FollowService {
   constructor(private readonly followRepository: FollowRepository) {}
 
-  follow(from: User, to: User): Promise<boolean> {
-    return this.followRepository.follow(from, to);
-  }
+  // follow(from: User, to: User): Promise<boolean> {
+  //   return this.followRepository.follow(from, to);
+  // }
 
-  unfollow(from: User, to: User): Promise<boolean> {
-    return this.followRepository.unfollow(from, to);
-  }
+  // unfollow(from: User, to: User): Promise<boolean> {
+  //   return this.followRepository.unfollow(from, to);
+  // }
 }
