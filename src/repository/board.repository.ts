@@ -27,6 +27,7 @@ export class BoardRepository extends Repository<Board> {
     try {
       const board = await transactionManager.findOne(Board, {
         where: { id: id },
+        cache: true,
       });
 
       if (!board) {

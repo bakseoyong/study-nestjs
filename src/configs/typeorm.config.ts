@@ -9,4 +9,5 @@ export const typeORMConfig: TypeOrmModuleOptions = {
   database: 'board',
   entities: ['dist/**/*.entity{.ts,.js}'], // Throw error if delete '.js'
   synchronize: true,
+  cache: true,
 };
