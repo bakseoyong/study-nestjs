@@ -19,7 +19,7 @@ export class UploadController {
     const uploadedFiles: string[] = this.uploadService.uploadFiles(files);
 
     return {
-      status: HttpStatus.ACCEPTED,
+      status: HttpStatus.CREATED,
       message: 'files upload success',
       data: {
         files: uploadedFiles,

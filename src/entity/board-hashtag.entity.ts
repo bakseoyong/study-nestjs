@@ -15,11 +15,11 @@ export class BoardHashtag extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // @ManyToOne((type) => Board, (board) => board.boardHashtag)
-  // @JoinColumn()
-  // board: Board;
+  @ManyToOne((type) => Board, (board) => board.boardHashtag)
+  @JoinColumn()
+  board: Board;
 
-  // @ManyToOne((type) => Hashtag, (hashtag) => hashtag.boardHashtag)
-  // @JoinColumn()
-  // hashtag: Hashtag;
+  @ManyToOne((type) => Hashtag, (hashtag) => hashtag.boardHashtag)
+  @JoinColumn()
+  hashtag: Hashtag;
 }

@@ -46,9 +46,9 @@ export class Board extends BaseEntity {
   deleted: Date;
 
   // '/board/my-scrap-board' JOIN
-  // @OneToMany((type) => Scrap, (scrap) => scrap.board)
-  // scrap: Scrap[];
+  @OneToMany((type) => Scrap, (scrap) => scrap.board)
+  scrap: Scrap[];
 
-  // @OneToMany((type) => BoardHashtag, (boardHashtag) => boardHashtag.board)
-  // boardHashtag: BoardHashtag[];
+  @OneToMany((type) => BoardHashtag, (boardHashtag) => boardHashtag.board)
+  boardHashtag: BoardHashtag[];
 }

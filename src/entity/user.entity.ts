@@ -66,11 +66,11 @@ export class User extends BaseEntity {
   // @JoinTable()
   // following: User[];
 
-  // @OneToMany((type) => Follow, (follow) => follow.to)
-  // followings: Follow[];
+  @OneToMany((type) => Follow, (follow) => follow.to)
+  followings: Follow[];
 
-  // @OneToMany((type) => Follow, (follow) => follow.from)
-  // followers: Follow[];
+  @OneToMany((type) => Follow, (follow) => follow.from)
+  followers: Follow[];
 
   // @ManyToMany((type) => User, (user) => user.following)
   // @JoinTable()
