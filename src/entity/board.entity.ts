@@ -1,3 +1,4 @@
+import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 import {
   BaseEntity,
   Column,
@@ -18,6 +19,8 @@ export class Board extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @IsString()
+  @IsNotEmpty()
   @Column({ type: 'varchar', comment: 'author' })
   author: string;
 
@@ -30,9 +33,17 @@ export class Board extends BaseEntity {
   @Column({ type: 'integer', default: 0, comment: 'num of scraps' })
   scraps: number;
 
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(2)
+  @MaxLength(50)
   @Column({ type: 'varchar', comment: 'Title' })
   title: string;
 
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(10)
+  @MaxLength(500)
   @Column({ type: 'varchar', comment: 'Content' })
   content: string;
 

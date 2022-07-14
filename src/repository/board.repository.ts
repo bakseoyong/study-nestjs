@@ -26,7 +26,6 @@ export class BoardRepository extends Repository<Board> {
     try {
       const board = await transactionManager.findOne(Board, {
         where: { id: id },
-        cache: true,
       });
 
       if (!board) {
@@ -173,7 +172,6 @@ export class BoardRepository extends Repository<Board> {
       .having('cursorr < :cursorr', { cursorr: cursor })
       .orderBy('likes', 'DESC')
       .orderBy('id', 'DESC')
-      .cache(1000)
       .take(paginationBoardDto.limit);
 
     return await boards.execute();
@@ -205,7 +203,6 @@ export class BoardRepository extends Repository<Board> {
       .from(Board, 'boards')
       .orderBy('likes', 'DESC')
       .orderBy('id', 'DESC')
-      .cache(1000)
       .take(paginationBoardDto.limit);
 
     return await boards.execute();

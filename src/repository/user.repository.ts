@@ -16,11 +16,11 @@ import * as bcrypt from 'bcrypt';
 export class UserRepository extends Repository<User> {
   async createUser(createUserDto: CreateUserDto): Promise<boolean> {
     try {
-      const { id, email, phone } = createUserDto;
+      const { uid, email, phone } = createUserDto;
       const password = await bcrypt.hash(createUserDto.password, 10);
 
       const user = await this.save({
-        id,
+        uid,
         password,
         salt: '임시',
         email,
