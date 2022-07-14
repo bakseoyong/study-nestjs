@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeORMConfig } from './configs/typeorm.config';
 import { UserModule } from './user/user.module';
@@ -10,6 +10,7 @@ import { NotificationModule } from './notification/notification.module';
 import { HashtagModule } from './hashtag/hashtag.module';
 import { FollowModule } from './follow/follow.module';
 import { UploadModule } from './upload/upload.module';
+import { RedisCacheModule } from './cache/redis-cache.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { UploadModule } from './upload/upload.module';
     HashtagModule,
     FollowModule,
     UploadModule,
+    CacheModule.register(),
   ],
   controllers: [],
   providers: [EventsGateway],

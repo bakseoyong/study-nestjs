@@ -16,7 +16,6 @@ import {
 } from 'typeorm';
 import { PaginationBoardDto } from 'src/board/dto/pagination-boards.dto';
 import { Scrap } from 'src/entity/scrap.entity';
-import { User } from 'src/entity/user.entity';
 
 @EntityRepository(Board) //@EntityRepository deprecated in typeorm@^0.3.6
 export class BoardRepository extends Repository<Board> {
@@ -174,6 +173,7 @@ export class BoardRepository extends Repository<Board> {
       .having('cursorr < :cursorr', { cursorr: cursor })
       .orderBy('likes', 'DESC')
       .orderBy('id', 'DESC')
+      .cache(1000)
       .take(paginationBoardDto.limit);
 
     return await boards.execute();
@@ -205,6 +205,7 @@ export class BoardRepository extends Repository<Board> {
       .from(Board, 'boards')
       .orderBy('likes', 'DESC')
       .orderBy('id', 'DESC')
+      .cache(1000)
       .take(paginationBoardDto.limit);
 
     return await boards.execute();
