@@ -20,12 +20,10 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { InitViewDto } from './dto/init-view.dto';
 import { ScrapBoardDto } from './dto/scrap-board.dto';
 import { HttpService } from '@nestjs/axios';
-import { AxiosResponse } from 'axios';
-import { map } from 'rxjs';
 import { NotificationType } from 'src/entity/notification.entity';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from 'src/entity/user.entity';
-import { Hashtag } from 'src/entity/hashtag.entity';
+import { UpdateBoardDto } from './dto/update-board.dto';
 
 @ApiTags('게시글 API')
 @Controller('board')
@@ -53,45 +51,13 @@ export class BoardController {
   @Post('/create-board')
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
-  async createBoard(@Body() body, @Req() req): Promise<any> {
-    const hashtags: Hashtag[] = await this.httpService
-      .post(`http://localhost:3000/hashtag/find-or-create`, body.tagNames)
-      .pipe(
-        map((axiosResponse: AxiosResponse) => {
-          return axiosResponse.data;
-        }),
-      )[0];
-
-    const createBoardDto: CreateBoardDto = {
-      title: body.title,
-      content: body.content,
-      author: req.user.id,
-    };
-
-    const board = await this.boardService.createBoard(createBoardDto);
-
-    //board - hashtag
-    await this.httpService.post(
-      `http://localhost:3000/hashtag/create-board-hashtag`,
-      { board, hashtags },
-    );
-
-    //Observable<AxiosResponse<Object[]>>
-    const author = await this.httpService.get(
-      `http://localhost:3000/user/followers/${req.user.id}`,
-    );
-
-    const followers = author.pipe(map((response) => response.data))[0].follower;
-
-    const data = {
-      followers: followers,
-      url: `http://localhost:3000/board/view/${board.id}`,
-      creator: board.author,
-    };
-
-    await this.httpService.post(
-      `http://localhost:3000/notification/following-new-board`,
-      data,
+  async createBoard(
+    @Body() createBoardDto: CreateBoardDto,
+    @Req() req,
+  ): Promise<any> {
+    const board = await this.boardService.createBoard(
+      createBoardDto,
+      req.user.id,
     );
   }
 
@@ -241,5 +207,19 @@ export class BoardController {
   @UsePipes(ValidationPipe)
   getScrapBoardsFindByUserId(@Req() req): Promise<any> {
     return this.boardService.getScrapBoardsFindByUserId(req.user.id);
+  }
+
+  @ApiOperation({
+    summary: '게시글 수정 API',
+    description: '작성한 게시글을 수정합니다.',
+  })
+  @Post('/update/:id')
+  @UseGuards(JwtAuthGuard)
+  updateBoard(
+    @Req() req,
+    @Body() updateBoardDto: UpdateBoardDto,
+    @Param() param,
+  ): Promise<boolean> {
+    return this.boardService.updateBoard(req.user.id, updateBoardDto, param.id);
   }
 }

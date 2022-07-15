@@ -41,11 +41,11 @@ export class UserRepository extends Repository<User> {
 
   async updateUser(updateUserDto: UpdateUserDto): Promise<boolean> {
     try {
-      const { id, email, phone } = updateUserDto;
+      const { uid, email, phone } = updateUserDto;
       const password = await bcrypt.hash(updateUserDto.password, 10);
 
       const user = await this.update(
-        { id },
+        { uid },
         {
           password,
           email,

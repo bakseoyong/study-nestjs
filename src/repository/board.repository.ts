@@ -16,6 +16,7 @@ import {
 } from 'typeorm';
 import { PaginationBoardDto } from 'src/board/dto/pagination-boards.dto';
 import { Scrap } from 'src/entity/scrap.entity';
+import { UpdateBoardDto } from 'src/board/dto/update-board.dto';
 
 @EntityRepository(Board) //@EntityRepository deprecated in typeorm@^0.3.6
 export class BoardRepository extends Repository<Board> {
@@ -270,7 +271,7 @@ export class BoardRepository extends Repository<Board> {
     }
   }
 
-  async getAuthorById(boardId: string): Promise<string> {
+  async getAuthorById(boardId: number): Promise<string> {
     try {
       const board = await this.findOne({
         where: { id: boardId },
@@ -285,5 +286,21 @@ export class BoardRepository extends Repository<Board> {
         HttpStatus.FORBIDDEN,
       );
     }
+  }
+
+  async updateBoard(
+    userId: string,
+    updateBoardDto: UpdateBoardDto,
+    boardId: number,
+  ): Promise<Board> {
+    const { title, content, ...other } = updateBoardDto;
+
+    const board = await this.findOne(boardId);
+
+    board.title = title;
+    board.content = content;
+
+    const updatedBoard = await this.save(board);
+    return updatedBoard;
   }
 }

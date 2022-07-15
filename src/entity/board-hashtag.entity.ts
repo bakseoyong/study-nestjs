@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   BaseEntity,
   Entity,
@@ -15,10 +16,18 @@ export class BoardHashtag extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ApiProperty({
+    example: '1',
+    description: '게시글 번호',
+  })
   @ManyToOne((type) => Board, (board) => board.boardHashtag)
   @JoinColumn()
   board: Board;
 
+  @ApiProperty({
+    example: '#테스트',
+    description: '해시태그',
+  })
   @ManyToOne((type) => Hashtag, (hashtag) => hashtag.boardHashtag)
   @JoinColumn()
   hashtag: Hashtag;

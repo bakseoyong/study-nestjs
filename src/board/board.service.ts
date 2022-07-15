@@ -1,5 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
+import { Hashtag } from 'src/entity/hashtag.entity';
+import { NotificationType } from 'src/entity/notification.entity';
+import { FollowService } from 'src/follow/follow.service';
+import { CreateBoardHashtagDto } from 'src/hashtag/dto/create-hashtag-board.dto';
+import { HashtagService } from 'src/hashtag/hashtag.service';
+import { CreateNotiDto } from 'src/notification/dto/create-noti.dto';
+import { NotificationService } from 'src/notification/notification.service';
 import { BoardRepository } from 'src/repository/board.repository';
 import { CommentRepository } from 'src/repository/comment.repository';
 import { RecommendRepository } from 'src/repository/recommend.repository';
@@ -11,6 +18,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { InitViewDto } from './dto/init-view.dto';
 import { PaginationBoardDto, SortType } from './dto/pagination-boards.dto';
 import { ScrapBoardDto } from './dto/scrap-board.dto';
+import { UpdateBoardDto } from './dto/update-board.dto';
 
 @Injectable()
 export class BoardService {
@@ -20,6 +28,10 @@ export class BoardService {
     private readonly reportRepository: ReportRepository,
     private readonly commentRepository: CommentRepository,
     private readonly scrapRepository: ScrapRepository,
+
+    private readonly hashtagService: HashtagService,
+    private readonly followService: FollowService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async getBoardById(id: number): Promise<InitViewDto> {
@@ -48,8 +60,33 @@ export class BoardService {
     }
   }
 
-  createBoard(createBoardDto: CreateBoardDto): Promise<Board> {
-    return this.boardRepository.createBoard(createBoardDto);
+  async createBoard(
+    createBoardDto: CreateBoardDto,
+    userId: string,
+  ): Promise<Board> {
+    const hashtags: Hashtag[] = await this.hashtagService.findOrCreateHashtags(
+      createBoardDto.tagNames,
+    );
+
+    const board = await this.boardRepository.createBoard(createBoardDto);
+
+    const createBoardHashtagDto: CreateBoardHashtagDto = { board, hashtags };
+
+    await this.hashtagService.createBoardHashtags(createBoardHashtagDto);
+
+    const followers = await this.followService.getFollowersByUserId(userId);
+    const followerUids = followers.map((follower) => follower.uid);
+
+    const createNotiDto: CreateNotiDto = {
+      receivers: followerUids,
+      url: `http://localhost:3000/board/view/${board.id}`,
+      creator: board.author,
+      notiType: NotificationType.FOLLWER_BOARD,
+    };
+
+    await this.notificationService.createNoti(createNotiDto);
+
+    return board;
   }
 
   setAuthorUndefined(userId: string): Promise<boolean> {
@@ -178,7 +215,28 @@ export class BoardService {
     // }
   }
 
-  getAuthorById(boardId: string): Promise<string> {
+  getAuthorById(boardId: number): Promise<string> {
     return this.boardRepository.getAuthorById(boardId);
+  }
+
+  async updateBoard(
+    userId: string,
+    updateBoardDto: UpdateBoardDto,
+    boardId: number,
+  ): Promise<boolean> {
+    const board = await this.boardRepository.updateBoard(
+      userId,
+      updateBoardDto,
+      boardId,
+    );
+
+    const hashtags = await this.hashtagService.findOrCreateHashtags(
+      updateBoardDto.postTagNames,
+    );
+
+    this.hashtagService.updateBoardHashtags({ board, hashtags });
+    // this.hashtagService.deleteBoardHashtags(boardId);
+    // this.hashtagService.createBoardHashtags();
+    return true;
   }
 }
