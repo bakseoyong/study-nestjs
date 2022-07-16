@@ -12,8 +12,8 @@ export class FollowRepository extends Repository<Follow> {
     // 3. manyToOne 관계에서 외래키가 유저 id일텐데 이걸로 할 수 있지 않을까...
     //oneToMany 에서 find쓰는법 알아오기
     try {
-      const follows: Follow[] = await this.createQueryBuilder('user')
-        .innerJoinAndSelect('user.followings', 'followings')
+      const follows: Follow[] = await this.createQueryBuilder('userActivity')
+        .innerJoinAndSelect('userActivity.followings', 'followings')
         .where('user_id = :userId', { userId: userId })
         .getMany();
 

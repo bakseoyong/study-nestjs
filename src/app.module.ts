@@ -11,6 +11,7 @@ import { HashtagModule } from './hashtag/hashtag.module';
 import { FollowModule } from './follow/follow.module';
 import { UploadModule } from './upload/upload.module';
 import { RedisCacheModule } from './cache/redis-cache.module';
+import { NoteModule } from './note/note.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { RedisCacheModule } from './cache/redis-cache.module';
     FollowModule,
     UploadModule,
     CacheModule.register(),
+    NoteModule,
   ],
   controllers: [],
   providers: [EventsGateway],

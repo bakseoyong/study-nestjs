@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
+import { UserActivity } from './user-activity.entity';
 import { User } from './user.entity';
 
 @Entity({ name: 'follows' })
@@ -15,10 +16,10 @@ export class Follow extends BaseEntity {
   id: number;
 
   // 나를 팔로우 하는 사람
-  @ManyToOne((type) => User, (user) => user.followers)
-  to: User;
+  @ManyToOne((type) => UserActivity, (userActivity) => userActivity.followers)
+  to: UserActivity;
 
   //내가 팔로우 하는 사람
-  @ManyToOne((type) => User, (user) => user.followings)
-  from: User;
+  @ManyToOne((type) => UserActivity, (userActivity) => userActivity.followings)
+  from: UserActivity;
 }

@@ -14,9 +14,10 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { Roles } from 'src/decorators/roles.decorator';
-import { Role, User } from 'src/entity/user.entity';
+import { Role, UserProfile } from 'src/entity/user-profile.entity';
+import { User } from 'src/entity/user.entity';
 import { CreateUserDto } from './dto/createUser.dto';
-import { UpdateUserDto } from './dto/updateUser.dto';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UserService } from './user.service';
 
 @ApiTags('유저 API')
@@ -40,8 +41,10 @@ export class UserController {
   })
   @Patch('/update-user')
   @UsePipes(ValidationPipe)
-  updateUser(@Body() updateUserDto: UpdateUserDto): Promise<boolean> {
-    return this.userService.updateUser(updateUserDto);
+  updateUser(
+    @Body() updateUserProfileDto: UpdateUserProfileDto,
+  ): Promise<boolean> {
+    return this.userService.updateUserProfile(updateUserProfileDto);
   }
 
   @ApiOperation({
@@ -73,7 +76,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('/read-all-user')
   @UsePipes(ValidationPipe)
-  readAllUser(): Promise<User[]> {
+  readAllUser(): Promise<UserProfile[]> {
     return this.userService.readAllUser();
   }
 

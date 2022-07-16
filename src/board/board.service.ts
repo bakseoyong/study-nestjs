@@ -75,7 +75,7 @@ export class BoardService {
     await this.hashtagService.createBoardHashtags(createBoardHashtagDto);
 
     const followers = await this.followService.getFollowersByUserId(userId);
-    const followerUids = followers.map((follower) => follower.uid);
+    const followerUids = followers.map((follower) => follower.user.id);
 
     const createNotiDto: CreateNotiDto = {
       receivers: followerUids,

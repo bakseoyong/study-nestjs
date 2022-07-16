@@ -46,3 +46,10 @@ sse 예제코드는 보니까 알겠는데, 웹소켓에서 실시간 푸시알�
 
 
 게시글 신고 이유 추가해야겠다.
+
+쪽지
+
+//1. user를 profile과 activity로 나눈다.
+//2. activity에 쪽지함을 추가 (ManyToMany)
+//3. 쪽지를 보낼 경우 redis에 저장한다. key는 note엔티티에서 생성될 note${id}, value는 {from, to, content}
+//4. 내용을 삭제해도 상대편에서 보내면 다시 생성될텐데 => 이거 로직좀 봐봐야될것같은데 
