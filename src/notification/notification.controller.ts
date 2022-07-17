@@ -20,25 +20,6 @@ export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
   @ApiOperation({
-    summary: '팔로우 새글 등록 알림 API',
-    description: '팔로워들에게 새로운 글 등록에 대한 알림을 전송합니다.',
-  })
-  @Post('/following-new-board')
-  newBoardNotiToFollowers(@Body() body): Promise<boolean> {
-    Logger.log(body.followers);
-
-    const newBoardNotiToFollowersDto: NewBoardNotiToFollowersDto = {
-      receivers: body.followers,
-      url: body.url,
-      creator: body.creator,
-    };
-
-    return this.notificationService.newBoardNotiToFollowers(
-      newBoardNotiToFollowersDto,
-    );
-  }
-
-  @ApiOperation({
     summary: '알림 생성 API',
     description: '알림 타입에 맞춰 알림을 생성합니다.',
   })

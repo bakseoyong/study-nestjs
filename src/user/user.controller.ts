@@ -15,7 +15,6 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role, UserProfile } from 'src/entity/user-profile.entity';
-import { User } from 'src/entity/user.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UserService } from './user.service';

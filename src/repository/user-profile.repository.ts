@@ -3,7 +3,6 @@ import {
   HttpException,
   HttpStatus,
   Logger,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from 'src/user/dto/createUser.dto';

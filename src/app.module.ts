@@ -12,6 +12,7 @@ import { FollowModule } from './follow/follow.module';
 import { UploadModule } from './upload/upload.module';
 import { RedisCacheModule } from './cache/redis-cache.module';
 import { NoteModule } from './note/note.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { NoteModule } from './note/note.module';
     UploadModule,
     CacheModule.register(),
     NoteModule,
+    CommentModule,
   ],
   controllers: [],
   providers: [EventsGateway],

@@ -53,3 +53,6 @@ sse 예제코드는 보니까 알겠는데, 웹소켓에서 실시간 푸시알�
 //2. activity에 쪽지함을 추가 (ManyToMany)
 //3. 쪽지를 보낼 경우 redis에 저장한다. key는 note엔티티에서 생성될 note${id}, value는 {from, to, content}
 //4. 내용을 삭제해도 상대편에서 보내면 다시 생성될텐데 => 이거 로직좀 봐봐야될것같은데 
+
+순환참조 해결
+// UserActivity에서 순환참조가 일어난다고 생각.

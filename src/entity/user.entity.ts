@@ -1,11 +1,4 @@
-import {
-  BaseEntity,
-  Entity,
-  OneToOne,
-  PrimaryColumn,
-  PrimaryGeneratedColumn,
-  Unique,
-} from 'typeorm';
+import { BaseEntity, Entity, OneToOne, PrimaryColumn, Unique } from 'typeorm';
 import { UserActivity } from './user-activity.entity';
 import { UserProfile } from './user-profile.entity';
 

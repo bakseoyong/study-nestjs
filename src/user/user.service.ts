@@ -7,7 +7,9 @@ import { UserActivityRepository } from 'src/repository/user-activity.repository'
 import { UserProfileRepository } from 'src/repository/user-profile.repository';
 import { UserRepository } from 'src/repository/user.repository';
 import { CreateUserDto } from './dto/createUser.dto';
+import { FollowersDto } from './dto/followers.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
+import { UserActivityDto } from './dto/user-activity.dto';
 
 @Injectable()
 export class UserService {
@@ -47,5 +49,17 @@ export class UserService {
 
   readAllUser(): Promise<UserProfile[]> {
     return this.userProfileRepository.readAllUser();
+  }
+
+  getById(userId: string): Promise<User> {
+    return this.userRepository.getById(userId);
+  }
+
+  getActivityById(userId: string): Promise<UserActivityDto> {
+    return this.userActivityRepository.getById(userId);
+  }
+
+  getFollowers(userId: string): Promise<FollowersDto> {
+    return this.userActivityRepository.getFollowers(userId);
   }
 }

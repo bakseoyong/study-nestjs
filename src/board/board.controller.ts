@@ -16,14 +16,12 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardService } from './board.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { PaginationBoardDto } from './dto/pagination-boards.dto';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { InitViewDto } from './dto/init-view.dto';
 import { ScrapBoardDto } from './dto/scrap-board.dto';
 import { HttpService } from '@nestjs/axios';
-import { NotificationType } from 'src/entity/notification.entity';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from 'src/entity/user.entity';
 import { UpdateBoardDto } from './dto/update-board.dto';
+import { BoardDto } from 'src/entity/dto/board.dto';
 
 @ApiTags('게시글 API')
 @Controller('board')
@@ -40,8 +38,9 @@ export class BoardController {
   @ApiCreatedResponse({ description: '게시글을 조회합니다.', type: User })
   @Get('/view/:id')
   //@Render('view.ejs')
-  getBoardById(@Param('id') id: number): Promise<InitViewDto> {
-    return this.boardService.getBoardById(id);
+  getRelationById(@Param('id') id: number): void {
+    //return this.boardService.getBoardById(id);
+    return;
   }
 
   @ApiOperation({
@@ -78,7 +77,7 @@ export class BoardController {
   })
   @Get('/written-boards/:id')
   @UsePipes(ValidationPipe)
-  findByUserId(@Param('id') userId: string): Promise<Board[]> {
+  findByUserId(@Param('id') userId: string): Promise<BoardDto[]> {
     return this.boardService.findByUserId(userId);
   }
 
@@ -148,42 +147,6 @@ export class BoardController {
   }
 
   @ApiOperation({
-    summary: '댓글 작성 API',
-    description: '게시글에 댓글을 작성합니다.',
-  })
-  @Post('/create-comment/:id')
-  @UseGuards(JwtAuthGuard)
-  @UsePipes(ValidationPipe)
-  async createComment(
-    @Param() param,
-    @Body() data,
-    @Req() req,
-  ): Promise<boolean> {
-    const createCommentDto: CreateCommentDto = {
-      boardId: param.id,
-      content: data.content,
-      commenter: req.user.id,
-    };
-    await this.boardService.createComment(createCommentDto);
-
-    const notiData = {
-      //createComment가 board를 리턴하는게 이상하지. boardId로 유저 정보 가져오게 하자
-      receivers: await this.boardService.getAuthorById(param.id),
-      url: `http://localhost:3000/view/board/${param.id}`,
-      creator: req.user.id,
-      notiType: NotificationType.WRITE_BOARD_COMMENT,
-    };
-
-    //글 작성자에게 알림
-    await this.httpService.post(
-      `http://localhost:3000/notification/create`,
-      notiData,
-    );
-
-    return true;
-  }
-
-  @ApiOperation({
     summary: '게시글 스크랩 API',
     description: '게시글을 스크랩합니다.',
   })
@@ -205,7 +168,7 @@ export class BoardController {
   @Get('/my-scrap-boards')
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
-  getScrapBoardsFindByUserId(@Req() req): Promise<any> {
+  getScrapBoardsFindByUserId(@Req() req): Promise<BoardDto[]> {
     return this.boardService.getScrapBoardsFindByUserId(req.user.id);
   }
 

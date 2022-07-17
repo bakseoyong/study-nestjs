@@ -6,34 +6,6 @@ import { EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(Notification) //@EntityRepository deprecated in typeorm@^0.3.6
 export class NotificationRepository extends Repository<Notification> {
-  async newBoardNotiToFollowers(
-    newBoardNotiToFollowersDto: NewBoardNotiToFollowersDto,
-  ): Promise<boolean> {
-    try {
-      const { receivers, url, creator } = newBoardNotiToFollowersDto;
-      for (const receiver of receivers) {
-        this.save({
-          receiver: receiver,
-          url: url,
-          creator: creator,
-          notiType: NotificationType.FOLLWER_BOARD,
-          content: `${creator}가 새글을 작성했습니다.`,
-        });
-      }
-      return true;
-    } catch (error) {
-      Logger.log(error);
-      throw new HttpException(
-        {
-          message: 'SQL Error',
-          error: error.sqlMessage,
-          //error: error,
-        },
-        HttpStatus.FORBIDDEN,
-      );
-    }
-  }
-
   //다른 알람은 통합된걸로 만들어보자
   async createNoti(createNotiDto: CreateNotiDto): Promise<boolean> {
     try {
@@ -60,13 +32,12 @@ export class NotificationRepository extends Repository<Notification> {
       }
 
       for (const receiver of receivers) {
-        this.save({
-          receiver: receiver,
-          url: url,
-          creator: creator,
-          notiType: NotificationType.FOLLWER_BOARD,
-          content: content,
-        });
+        const notification = new Notification();
+        notification.user = receiver;
+        notification.url = url;
+        notification.creator = creator;
+        notification.content = content;
+        this.save(notification);
       }
       return true;
     } catch (error) {

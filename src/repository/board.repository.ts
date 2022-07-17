@@ -17,32 +17,43 @@ import {
 import { PaginationBoardDto } from 'src/board/dto/pagination-boards.dto';
 import { Scrap } from 'src/entity/scrap.entity';
 import { UpdateBoardDto } from 'src/board/dto/update-board.dto';
+import { BoardDto } from 'src/entity/dto/board.dto';
 
 @EntityRepository(Board) //@EntityRepository deprecated in typeorm@^0.3.6
 export class BoardRepository extends Repository<Board> {
-  async getBoardById(
-    @TransactionManager() transactionManager: EntityManager,
-    id: number,
-  ): Promise<Board> {
-    try {
-      const board = await transactionManager.findOne(Board, {
-        where: { id: id },
-      });
+  // async getBoardById(
+  //   @TransactionManager() transactionManager: EntityManager,
+  //   id: number,
+  // ): Promise<Board> {
+  //   try {
+  //     const board = await transactionManager.findOne(Board, {
+  //       where: { id: id },
+  //     });
 
-      if (!board) {
-        throw new NotFoundException('board does not exist');
-      }
+  //     if (!board) {
+  //       throw new NotFoundException('board does not exist');
+  //     }
 
-      return board;
-    } catch (error) {
-      throw new HttpException(
-        {
-          message: 'SQL Error',
-          error: error.sqlMessage,
-        },
-        HttpStatus.FORBIDDEN,
-      );
-    }
+  //     return board;
+  //   } catch (error) {
+  //     throw new HttpException(
+  //       {
+  //         message: 'SQL Error',
+  //         error: error.sqlMessage,
+  //       },
+  //       HttpStatus.FORBIDDEN,
+  //     );
+  //   }
+  // }
+
+  async getById(boardId: number): Promise<BoardDto> {
+    const boardDto: BoardDto = await this.getById(boardId);
+    return boardDto;
+  }
+
+  async findById(boardId: number): Promise<BoardDto> {
+    const boardDto: BoardDto = await this.findById(boardId);
+    return boardDto;
   }
 
   async createBoard(createBoardDto: CreateBoardDto): Promise<Board> {
@@ -86,11 +97,13 @@ export class BoardRepository extends Repository<Board> {
     }
   }
 
-  async findByUserId(userId: string): Promise<Board[]> {
+  async findByUserId(userId: string): Promise<BoardDto[]> {
     try {
-      const boards = await this.find({ where: { author: userId } });
+      const boardDtos: BoardDto[] = await this.find({
+        where: { author: userId },
+      });
 
-      return boards;
+      return boardDtos;
     } catch (error) {
       throw new HttpException(
         {

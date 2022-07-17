@@ -3,9 +3,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
+import { UserActivity } from './user-activity.entity';
 
 export enum NotificationType {
   WRITE_BOARD_LIKES = 1,
@@ -21,20 +23,22 @@ export class Notification extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  //알림 타입(작성한 게시글에 댓글 작성, 작성한 게시글에 좋아요, 팔로워한 유저의 새글 올림,
-  //내가 작성한 댓글에 좋아요, 내가 작성한 댓글에 댓글)
   @Column({
     type: 'enum',
     enum: NotificationType,
   })
   notiType: NotificationType;
 
-  @Column({ type: 'varchar', comment: 'alarm receiver' })
-  receiver: string;
+  @ManyToOne(
+    (type) => UserActivity,
+    (userActivity) => userActivity.notifications,
+  )
+  user: UserActivity;
 
   @Column({ type: 'varchar', comment: 'alarm url' })
   url: string;
 
+  //UserActivity Entity가 어떤 알림을 생성했는지는 불필요.
   @Column({ type: 'varchar', comment: 'alarm creator' })
   creator: string;
 

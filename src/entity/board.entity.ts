@@ -11,6 +11,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { BoardHashtag } from './board-hashtag.entity';
+import { Comment } from './comment.entity';
+import { BoardDto } from './dto/board.dto';
 import { Scrap } from './scrap.entity';
 
 @Entity({ name: 'boards' })
@@ -26,12 +28,6 @@ export class Board extends BaseEntity {
 
   @Column({ type: 'integer', default: 0, comment: 'likes' })
   likes: number;
-
-  @Column({ type: 'integer', default: 0, comment: 'num of comments' })
-  comments: number;
-
-  @Column({ type: 'integer', default: 0, comment: 'num of scraps' })
-  scraps: number;
 
   @IsString()
   @IsNotEmpty()
@@ -58,8 +54,24 @@ export class Board extends BaseEntity {
 
   // '/board/my-scrap-board' JOIN
   @OneToMany((type) => Scrap, (scrap) => scrap.board)
-  scrap: Scrap[];
+  scraps: Scrap[];
 
   @OneToMany((type) => BoardHashtag, (boardHashtag) => boardHashtag.board)
   boardHashtag: BoardHashtag[];
+
+  @OneToMany((type) => Comment, (comment) => comment.board)
+  comments: Comment[];
+
+  static from(boardDto: BoardDto) {
+    const board = new Board();
+    board.id = boardDto.id;
+    board.author = boardDto.author;
+    board.likes = boardDto.likes;
+    board.title = boardDto.title;
+    board.content = boardDto.content;
+    board.created = boardDto.created;
+    board.updated = boardDto.updated;
+    board.deleted = boardDto.deleted;
+    return board;
+  }
 }

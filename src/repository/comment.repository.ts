@@ -5,18 +5,23 @@ import {
   Repository,
   TransactionManager,
 } from 'typeorm';
-import { CreateCommentDto } from 'src/board/dto/create-comment.dto';
 import { Comment } from 'src/entity/comment.entity';
+import { Board } from 'src/entity/board.entity';
+import { UserActivity } from 'src/entity/user-activity.entity';
 
 @EntityRepository(Comment) //@EntityRepository deprecated in typeorm@^0.3.6
 export class CommentRepository extends Repository<Comment> {
   async createComment(
-    @TransactionManager() transactionManager: EntityManager,
-    createCommentDto: CreateCommentDto,
+    board: Board,
+    content: string,
+    user: UserActivity,
   ): Promise<boolean> {
     try {
-      const { boardId, content, commenter } = createCommentDto;
-      const comment = await this.save({ boardId, content, commenter });
+      const comment = new Comment();
+      comment.board = board;
+      comment.content = content;
+      comment.user = user;
+      comment.save();
       return comment ? true : false;
     } catch (error) {
       Logger.log(error);

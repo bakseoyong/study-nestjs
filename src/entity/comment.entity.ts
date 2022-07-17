@@ -4,10 +4,13 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
+import { Board } from './board.entity';
+import { UserActivity } from './user-activity.entity';
 
 @Entity({ name: 'comments' })
 @Unique(['id'])
@@ -15,11 +18,11 @@ export class Comment extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'integer', comment: 'board Id' })
-  boardId: number;
+  @ManyToOne((type) => Board, (board) => board.comments)
+  board: Board;
 
-  @Column({ type: 'varchar', comment: 'commenter' })
-  commenter: string;
+  @ManyToOne((type) => UserActivity, (userActivity) => userActivity.comments)
+  user: UserActivity;
 
   @Column({ type: 'varchar', comment: 'content' })
   content: string;

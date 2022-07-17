@@ -4,6 +4,10 @@ import { EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(User) //@EntityRepository deprecated in typeorm@^0.3.6
 export class UserRepository extends Repository<User> {
+  async getById(id: string): Promise<User> {
+    return this.getById(id);
+  }
+
   async deleteUser(id: string): Promise<boolean> {
     try {
       const deleteUser = await this.delete(id);
