@@ -11,5 +11,6 @@ import { BoardHashtagRepository } from 'src/repository/board-hashtag.repository'
   ],
   providers: [HashtagService],
   controllers: [HashtagController],
+  exports: [HashtagService, TypeOrmModule],
 })
 export class HashtagModule {}

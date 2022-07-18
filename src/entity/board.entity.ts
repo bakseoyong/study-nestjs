@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 import {
   BaseEntity,
@@ -54,12 +55,15 @@ export class Board extends BaseEntity {
 
   // '/board/my-scrap-board' JOIN
   @OneToMany((type) => Scrap, (scrap) => scrap.board)
+  @ApiProperty({ type: () => Scrap })
   scraps: Scrap[];
 
-  @OneToMany((type) => BoardHashtag, (boardHashtag) => boardHashtag.board)
+  @OneToMany((type) => BoardHashtag, (boardHashtag) => boardHashtag.aaa)
+  @ApiProperty({ type: () => BoardHashtag })
   boardHashtag: BoardHashtag[];
 
   @OneToMany((type) => Comment, (comment) => comment.board)
+  @ApiProperty({ type: () => Comment })
   comments: Comment[];
 
   static from(boardDto: BoardDto) {

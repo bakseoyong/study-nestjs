@@ -19,10 +19,11 @@ export class BoardHashtag extends BaseEntity {
   @ApiProperty({
     example: '1',
     description: '게시글 번호',
+    type: Board,
   })
   @ManyToOne((type) => Board, (board) => board.boardHashtag)
   @JoinColumn()
-  board: Board;
+  aaa: Board;
 
   @ApiProperty({
     example: '#테스트',

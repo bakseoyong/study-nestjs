@@ -1,23 +1,19 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { NotificationService } from 'src/notification/notification.service';
-import { BoardRepository } from 'src/repository/board.repository';
+import { BoardModule } from 'src/board/board.module';
+import { NotificationModule } from 'src/notification/notification.module';
 import { CommentRepository } from 'src/repository/comment.repository';
-import { NotificationRepository } from 'src/repository/notification.repository';
 import { UserActivityRepository } from 'src/repository/user-activity.repository';
 import { CommentController } from './comment.controller';
 import { CommentService } from './comment.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      CommentRepository,
-      BoardRepository,
-      UserActivityRepository,
-      NotificationRepository,
-    ]),
+    forwardRef(() => BoardModule),
+    NotificationModule,
+    TypeOrmModule.forFeature([CommentRepository, UserActivityRepository]),
   ],
   controllers: [CommentController],
-  providers: [CommentService, NotificationService],
+  providers: [CommentService],
 })
 export class CommentModule {}

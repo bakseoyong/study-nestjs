@@ -17,7 +17,6 @@ import { BoardService } from './board.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { PaginationBoardDto } from './dto/pagination-boards.dto';
 import { ScrapBoardDto } from './dto/scrap-board.dto';
-import { HttpService } from '@nestjs/axios';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from 'src/entity/user.entity';
 import { UpdateBoardDto } from './dto/update-board.dto';
@@ -26,10 +25,7 @@ import { BoardDto } from 'src/entity/dto/board.dto';
 @ApiTags('게시글 API')
 @Controller('board')
 export class BoardController {
-  constructor(
-    private readonly boardService: BoardService,
-    private readonly httpService: HttpService, //private readonly hashtagService: HashtagService,
-  ) {}
+  constructor(private readonly boardService: BoardService) {}
 
   @ApiOperation({
     summary: '게시글 조회 API',
@@ -82,17 +78,6 @@ export class BoardController {
   }
 
   @ApiOperation({
-    summary: '게시글 추천 API',
-    description: '게시글을 추천합니다.',
-  })
-  @Get('/recommend-board/:id')
-  @UseGuards(JwtAuthGuard)
-  @UsePipes(ValidationPipe)
-  recommendBoard(@Param('id') id: number, @Req() req): Promise<number> {
-    return this.boardService.recommendBoard(id, req.user.id);
-  }
-
-  @ApiOperation({
     summary: '날짜별 HOT게시글 조회 API',
     description:
       '요청된 날짜에 작성된 게시글 중 추천을 10개이상 받은 게시글을 조회합니다.',
@@ -101,17 +86,6 @@ export class BoardController {
   @UsePipes(ValidationPipe)
   findMoreThan10Likes(@Param('date') date: string): Promise<Board[]> {
     return this.boardService.findMoreThan10Likes(date);
-  }
-
-  @ApiOperation({
-    summary: '게시글 신고 API',
-    description: '게시글을 신고합니다.',
-  })
-  @UseGuards(JwtAuthGuard)
-  @Get('/report-board/:id')
-  @UsePipes(ValidationPipe)
-  reportBoard(@Param('id') id: number, @Req() req): Promise<boolean> {
-    return this.boardService.reportBoard(id, req.user.id);
   }
 
   @ApiOperation({
@@ -159,17 +133,6 @@ export class BoardController {
       userId: req.user.id,
     };
     return this.boardService.scrapBoard(scrapBoardDto);
-  }
-
-  @ApiOperation({
-    summary: '스크랩 게시글 조회 API',
-    description: '스크랩한 게시글들을 조회합니다.',
-  })
-  @Get('/my-scrap-boards')
-  @UseGuards(JwtAuthGuard)
-  @UsePipes(ValidationPipe)
-  getScrapBoardsFindByUserId(@Req() req): Promise<BoardDto[]> {
-    return this.boardService.getScrapBoardsFindByUserId(req.user.id);
   }
 
   @ApiOperation({

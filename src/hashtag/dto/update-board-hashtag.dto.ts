@@ -1,11 +1,11 @@
-import { PickType } from '@nestjs/swagger';
-import { IsArray, IsOptional } from 'class-validator';
-import { BoardHashtag } from 'src/entity/board-hashtag.entity';
+import { IsArray, IsNotEmpty, IsOptional } from 'class-validator';
+import { BoardDto } from 'src/entity/dto/board.dto';
 import { Hashtag } from 'src/entity/hashtag.entity';
 
-export class UpdateBoardHashtagDto extends PickType(BoardHashtag, [
-  'board',
-] as const) {
+export class UpdateBoardHashtagDto {
+  @IsNotEmpty()
+  board: BoardDto;
+
   @IsArray()
   @IsOptional()
   hashtags: Hashtag[];

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   BaseEntity,
   Column,
@@ -19,6 +20,7 @@ export class Comment extends BaseEntity {
   id: number;
 
   @ManyToOne((type) => Board, (board) => board.comments)
+  @ApiProperty({ type: Board })
   board: Board;
 
   @ManyToOne((type) => UserActivity, (userActivity) => userActivity.comments)

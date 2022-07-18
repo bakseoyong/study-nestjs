@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   BaseEntity,
   Column,
@@ -8,7 +9,6 @@ import {
 } from 'typeorm';
 import { Board } from './board.entity';
 import { UserActivity } from './user-activity.entity';
-import { User } from './user.entity';
 
 @Entity({ name: 'scraps' })
 @Unique(['id'])
@@ -26,6 +26,7 @@ export class Scrap extends BaseEntity {
   // board: Board;
 
   @ManyToOne((type) => Board, (board) => board.scraps)
+  @ApiProperty({ type: Board })
   board: Board;
 
   @ManyToOne((type) => UserActivity, (userActivity) => userActivity.scraps)
