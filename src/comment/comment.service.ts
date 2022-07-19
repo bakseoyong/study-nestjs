@@ -36,12 +36,14 @@ export class CommentService {
 
     this.commentRepository.createComment(board, content, user);
 
-    const followers = user.followers.map((follow) => follow.from);
+    const followers = user.followers.map((follow) =>
+      UserActivity.to(follow.from),
+    );
 
     const createNotiDto: CreateNotiDto = {
-      receivers: followers,
+      to: followers,
       url: `http://localhost:3000/view/board/${boardId}`,
-      creator: userId,
+      from: userId,
       notiType: NotificationType.WRITE_BOARD_COMMENT,
     };
 

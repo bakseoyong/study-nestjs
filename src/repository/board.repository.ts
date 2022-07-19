@@ -18,6 +18,8 @@ import { PaginationBoardDto } from 'src/board/dto/pagination-boards.dto';
 import { Scrap } from 'src/entity/scrap.entity';
 import { UpdateBoardDto } from 'src/board/dto/update-board.dto';
 import { BoardDto } from 'src/entity/dto/board.dto';
+import { RelationBoardDto } from 'src/entity/dto/relation-board.dto';
+import { UserActivityDto } from 'src/user/dto/user-activity.dto';
 
 @EntityRepository(Board) //@EntityRepository deprecated in typeorm@^0.3.6
 export class BoardRepository extends Repository<Board> {
@@ -47,8 +49,13 @@ export class BoardRepository extends Repository<Board> {
   // }
 
   async getById(boardId: number): Promise<BoardDto> {
-    const boardDto: BoardDto = await this.getById(boardId);
+    const boardDto: BoardDto = await this.findOne(boardId);
     return boardDto;
+  }
+
+  async getRelationById(boardId: number): Promise<RelationBoardDto> {
+    const relationBoardDto: RelationBoardDto = await this.findOne(boardId);
+    return relationBoardDto;
   }
 
   async findById(boardId: number): Promise<BoardDto> {
@@ -74,27 +81,27 @@ export class BoardRepository extends Repository<Board> {
   }
 
   async updateAuthorUndefined(userId: string): Promise<boolean> {
-    try {
-      const author = null;
-      const deleteBoards = await this.update(userId, {
-        author,
-      });
+    // try {
+    //   const deleteBoards = await this.update(userId, {
+    //     user,
+    //   });
 
-      //deleteBoards DeleteResult { raw : [], affected : 1 }
-      if (deleteBoards.affected === 0) {
-        throw new NotFoundException('There is no boards to delete');
-      }
+    //   //deleteBoards DeleteResult { raw : [], affected : 1 }
+    //   if (deleteBoards.affected === 0) {
+    //     throw new NotFoundException('There is no boards to delete');
+    //   }
 
-      return true;
-    } catch (error) {
-      throw new HttpException(
-        {
-          message: 'SQL Error',
-          error: error.sqlMessage,
-        },
-        HttpStatus.FORBIDDEN,
-      );
-    }
+    //   return true;
+    // } catch (error) {
+    //   throw new HttpException(
+    //     {
+    //       message: 'SQL Error',
+    //       error: error.sqlMessage,
+    //     },
+    //     HttpStatus.FORBIDDEN,
+    //   );
+    // }
+    return true;
   }
 
   async findByUserId(userId: string): Promise<BoardDto[]> {
@@ -284,12 +291,13 @@ export class BoardRepository extends Repository<Board> {
     }
   }
 
-  async getAuthorById(boardId: number): Promise<string> {
+  async getUserById(boardId: number): Promise<UserActivityDto> {
     try {
       const board = await this.findOne({
         where: { id: boardId },
       });
-      return board ? board.author : null;
+
+      return board ? board.user : null;
     } catch (error) {
       throw new HttpException(
         {

@@ -10,6 +10,7 @@ import {
   JoinColumn,
   ManyToOne,
 } from 'typeorm';
+import { Board } from './board.entity';
 import { Comment } from './comment.entity';
 import { Follow } from './follow.entity';
 import { Notification } from './notification.entity';
@@ -44,12 +45,22 @@ export class UserActivity extends BaseEntity {
   comments: Comment[];
 
   @ApiProperty({})
-  @OneToMany((type) => Notification, (notification) => notification.user)
+  @OneToMany((type) => Notification, (notification) => notification.to)
   notifications: Notification[];
 
-  static from(userActivityDto: UserActivityDto) {
+  @ApiProperty({})
+  @OneToMany((type) => Board, (board) => board.user)
+  boards: Board[];
+
+  static from(userActivityDto: UserActivityDto): UserActivity {
     const userActivity = new UserActivity();
     userActivity.id = userActivityDto.id;
     return userActivity;
+  }
+
+  static to(userActivity: UserActivity): UserActivityDto {
+    const userActivityDto = new UserActivityDto();
+    userActivityDto.id = userActivity.id;
+    return userActivityDto;
   }
 }

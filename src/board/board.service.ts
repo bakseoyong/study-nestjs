@@ -1,6 +1,7 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
 import { BoardDto } from 'src/entity/dto/board.dto';
+import { RelationBoardDto } from 'src/entity/dto/relation-board.dto';
 import { Hashtag } from 'src/entity/hashtag.entity';
 import { NotificationType } from 'src/entity/notification.entity';
 import { Scrap } from 'src/entity/scrap.entity';
@@ -35,6 +36,10 @@ export class BoardService {
     return this.boardRepository.getById(boardId);
   }
 
+  getRelationById(boardId: number): Promise<RelationBoardDto> {
+    return this.boardRepository.getRelationById(boardId);
+  }
+
   findById(boardId: number): Promise<BoardDto> {
     return this.boardRepository.findById(boardId);
   }
@@ -59,9 +64,9 @@ export class BoardService {
     const receivers = followDtos.followers.map((follow) => follow.from);
 
     const createNotiDto: CreateNotiDto = {
-      receivers: receivers,
+      to: receivers,
       url: `http://localhost:3000/board/view/${board.id}`,
-      creator: board.author,
+      from: board.user.id,
       notiType: NotificationType.FOLLWER_BOARD,
     };
 
@@ -123,8 +128,8 @@ export class BoardService {
     return true;
   }
 
-  getAuthorById(boardId: number): Promise<string> {
-    return this.boardRepository.getAuthorById(boardId);
+  async getAuthorById(boardId: number): Promise<string> {
+    return (await this.boardRepository.getUserById(boardId)).id;
   }
 
   async updateBoard(

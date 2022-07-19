@@ -21,6 +21,7 @@ import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from 'src/entity/user.entity';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { BoardDto } from 'src/entity/dto/board.dto';
+import { RelationBoardDto } from 'src/entity/dto/relation-board.dto';
 
 @ApiTags('게시글 API')
 @Controller('board')
@@ -34,9 +35,9 @@ export class BoardController {
   @ApiCreatedResponse({ description: '게시글을 조회합니다.', type: User })
   @Get('/view/:id')
   //@Render('view.ejs')
-  getRelationById(@Param('id') id: number): void {
+  getRelationById(@Param('id') id: number): Promise<RelationBoardDto> {
     //return this.boardService.getBoardById(id);
-    return;
+    return this.boardService.getRelationById(id);
   }
 
   @ApiOperation({

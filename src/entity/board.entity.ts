@@ -1,11 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   Unique,
@@ -15,6 +22,7 @@ import { BoardHashtag } from './board-hashtag.entity';
 import { Comment } from './comment.entity';
 import { BoardDto } from './dto/board.dto';
 import { Scrap } from './scrap.entity';
+import { UserActivity } from './user-activity.entity';
 
 @Entity({ name: 'boards' })
 @Unique(['id'])
@@ -22,10 +30,9 @@ export class Board extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @IsString()
-  @IsNotEmpty()
-  @Column({ type: 'varchar', comment: 'author' })
-  author: string;
+  @IsOptional()
+  @ManyToOne((type) => UserActivity, (userActivity) => userActivity.user)
+  user: UserActivity;
 
   @Column({ type: 'integer', default: 0, comment: 'likes' })
   likes: number;
@@ -58,7 +65,7 @@ export class Board extends BaseEntity {
   @ApiProperty({ type: () => Scrap })
   scraps: Scrap[];
 
-  @OneToMany((type) => BoardHashtag, (boardHashtag) => boardHashtag.aaa)
+  @OneToMany((type) => BoardHashtag, (boardHashtag) => boardHashtag.board)
   @ApiProperty({ type: () => BoardHashtag })
   boardHashtag: BoardHashtag[];
 
@@ -69,7 +76,7 @@ export class Board extends BaseEntity {
   static from(boardDto: BoardDto) {
     const board = new Board();
     board.id = boardDto.id;
-    board.author = boardDto.author;
+    board.user = boardDto.user;
     board.likes = boardDto.likes;
     board.title = boardDto.title;
     board.content = boardDto.content;

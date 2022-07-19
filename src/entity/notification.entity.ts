@@ -33,14 +33,14 @@ export class Notification extends BaseEntity {
     (type) => UserActivity,
     (userActivity) => userActivity.notifications,
   )
-  user: UserActivity;
+  to: UserActivity;
 
   @Column({ type: 'varchar', comment: 'alarm url' })
   url: string;
 
   //UserActivity Entity가 어떤 알림을 생성했는지는 불필요.
   @Column({ type: 'varchar', comment: 'alarm creator' })
-  creator: string;
+  from: string;
 
   @Column({ type: 'varchar', comment: 'alarm content' })
   content: string;

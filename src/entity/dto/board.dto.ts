@@ -1,7 +1,9 @@
+import { UserActivity } from '../user-activity.entity';
+
 export class BoardDto {
   id: number;
 
-  author: string;
+  user: UserActivity;
 
   likes: number;
 

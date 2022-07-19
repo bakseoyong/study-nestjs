@@ -13,7 +13,7 @@ export class BoardHashtagRepository extends Repository<BoardHashtag> {
       for (const hashtag of createBoardHashtagDto.hashtags) {
         const boardHashtag = new BoardHashtag();
         const board = Board.from(createBoardHashtagDto.board);
-        boardHashtag.aaa = board;
+        boardHashtag.board = board;
         boardHashtag.hashtag = hashtag;
         this.save(boardHashtag);
       }
