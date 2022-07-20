@@ -34,6 +34,9 @@ export class Board extends BaseEntity {
   @ManyToOne((type) => UserActivity, (userActivity) => userActivity.user)
   user: UserActivity;
 
+  @Column({ type: 'integer', default: 0, comment: 'view count' })
+  viewCount: number;
+
   @Column({ type: 'integer', default: 0, comment: 'likes' })
   likes: number;
 

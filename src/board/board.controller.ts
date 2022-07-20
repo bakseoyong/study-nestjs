@@ -10,6 +10,7 @@ import {
   Req,
   Query,
   Patch,
+  Logger,
 } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
 import { CreateBoardDto } from './dto/create-board.dto';
@@ -35,7 +36,9 @@ export class BoardController {
   @ApiCreatedResponse({ description: '게시글을 조회합니다.', type: User })
   @Get('/view/:id')
   //@Render('view.ejs')
-  getRelationById(@Param('id') id: number): Promise<RelationBoardDto> {
+  async getRelationById(@Param('id') id: number): Promise<RelationBoardDto> {
+    const viewCount = await this.boardService.viewBoard(id);
+    Logger.log(viewCount);
     return this.boardService.getRelationById(id);
   }
 
@@ -49,7 +52,7 @@ export class BoardController {
   createBoard(
     @Body() createBoardDto: CreateBoardDto,
     @Req() req,
-  ): Promise<Board> {
+  ): Promise<BoardDto> {
     return this.boardService.createBoard(createBoardDto, req.user.id);
   }
 

@@ -10,7 +10,6 @@ import { NotificationModule } from './notification/notification.module';
 import { HashtagModule } from './hashtag/hashtag.module';
 import { FollowModule } from './follow/follow.module';
 import { UploadModule } from './upload/upload.module';
-import { RedisCacheModule } from './cache/redis-cache.module';
 import { NoteModule } from './note/note.module';
 import { CommentModule } from './comment/comment.module';
 
@@ -25,7 +24,7 @@ import { CommentModule } from './comment/comment.module';
     HashtagModule,
     FollowModule,
     UploadModule,
-    CacheModule.register(),
+    //CacheModule.register(),
     NoteModule,
     CommentModule,
   ],

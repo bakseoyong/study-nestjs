@@ -1,4 +1,11 @@
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  CACHE_MANAGER,
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
+import { Cache } from 'cache-manager';
 import { Board } from 'src/entity/board.entity';
 import { BoardDto } from 'src/entity/dto/board.dto';
 import { RelationBoardDto } from 'src/entity/dto/relation-board.dto';
@@ -23,14 +30,11 @@ export class BoardService {
   constructor(
     private readonly boardRepository: BoardRepository,
 
-    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
-
-    @Inject(forwardRef(() => HashtagService))
     private readonly hashtagService: HashtagService,
-
-    @Inject(forwardRef(() => NotificationService))
     private readonly notificationService: NotificationService,
+
+    @Inject(CACHE_MANAGER) private readonly cacheMananger: Cache,
   ) {}
 
   async getById(boardId: number): Promise<BoardDto> {
@@ -45,7 +49,7 @@ export class BoardService {
   async createBoard(
     createBoardDto: CreateBoardDto,
     userId: string,
-  ): Promise<Board> {
+  ): Promise<BoardDto> {
     const hashtags: Hashtag[] = await this.hashtagService.findOrCreateHashtags(
       createBoardDto.tagNames,
     );
@@ -59,6 +63,9 @@ export class BoardService {
     await this.hashtagService.createBoardHashtags(createBoardHashtagDto);
 
     const followDtos = await this.userService.getFollowers(userId);
+    if (!followDtos.followers) {
+      return board;
+    }
     const receivers = followDtos.followers.map((follow) => follow.from);
 
     const createNotiDto: CreateNotiDto = {
@@ -70,8 +77,7 @@ export class BoardService {
 
     await this.notificationService.createNoti(createNotiDto);
 
-    const returnBoard = Board.from(board);
-    return returnBoard;
+    return board;
   }
 
   async setAuthorUndefined(userId: string): Promise<boolean> {
@@ -153,5 +159,26 @@ export class BoardService {
 
   likeBoard(boardId: number): Promise<boolean> {
     return this.boardRepository.likeBoard(boardId);
+  }
+
+  async viewBoard(boardId: number): Promise<number> {
+    let viewCnt: number = await this.cacheMananger.get(`viewCnt:${boardId}`);
+    let saved: Date = await this.cacheMananger.get(`saved:${boardId}`);
+    if (!viewCnt) {
+      const board = await this.boardRepository.getById(boardId);
+      viewCnt = board.viewCount;
+      saved = new Date();
+      await this.cacheMananger.set(`saved:${boardId}`, saved);
+    }
+    if (new Date().getTime() - saved.getTime() >= 1000 * 60 * 10) {
+      const board = await this.boardRepository.getById(boardId);
+      board.viewCount = viewCnt;
+      board.save();
+      this.cacheMananger.del(`viewCnt:${boardId}`);
+      this.cacheMananger.set(`saved:${boardId}`, new Date().getTime());
+    }
+    //Logger.log(saved);
+    await this.cacheMananger.set(`viewCnt:${boardId}`, viewCnt + 1);
+    return viewCnt + 1;
   }
 }

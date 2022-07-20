@@ -7,7 +7,6 @@ import {
   getConnection,
   MoreThanOrEqual,
   Repository,
-  Transaction,
   TransactionManager,
 } from 'typeorm';
 import { PaginationBoardDto } from 'src/board/dto/pagination-boards.dto';

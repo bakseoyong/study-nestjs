@@ -65,6 +65,6 @@ export class UserService {
   }
 
   getFollowers(userId: string): Promise<FollowersDto> {
-    return this.userActivityRepository.getFollowers(userId);
+    return this.userActivityRepository.getById(userId);
   }
 }
