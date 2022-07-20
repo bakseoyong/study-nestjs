@@ -36,7 +36,6 @@ export class BoardController {
   @Get('/view/:id')
   //@Render('view.ejs')
   getRelationById(@Param('id') id: number): Promise<RelationBoardDto> {
-    //return this.boardService.getBoardById(id);
     return this.boardService.getRelationById(id);
   }
 
@@ -47,14 +46,11 @@ export class BoardController {
   @Post('/create-board')
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
-  async createBoard(
+  createBoard(
     @Body() createBoardDto: CreateBoardDto,
     @Req() req,
-  ): Promise<any> {
-    const board = await this.boardService.createBoard(
-      createBoardDto,
-      req.user.id,
-    );
+  ): Promise<Board> {
+    return this.boardService.createBoard(createBoardDto, req.user.id);
   }
 
   @ApiOperation({

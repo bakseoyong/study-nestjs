@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
 import { CreateBoardDto } from 'src/board/dto/create-board.dto';
 import {
@@ -12,6 +7,7 @@ import {
   getConnection,
   MoreThanOrEqual,
   Repository,
+  Transaction,
   TransactionManager,
 } from 'typeorm';
 import { PaginationBoardDto } from 'src/board/dto/pagination-boards.dto';
@@ -20,37 +16,13 @@ import { UpdateBoardDto } from 'src/board/dto/update-board.dto';
 import { BoardDto } from 'src/entity/dto/board.dto';
 import { RelationBoardDto } from 'src/entity/dto/relation-board.dto';
 import { UserActivityDto } from 'src/user/dto/user-activity.dto';
+import { UserActivityBoardDto } from 'src/user/dto/user-activity-board.dto';
 
 @EntityRepository(Board) //@EntityRepository deprecated in typeorm@^0.3.6
 export class BoardRepository extends Repository<Board> {
-  // async getBoardById(
-  //   @TransactionManager() transactionManager: EntityManager,
-  //   id: number,
-  // ): Promise<Board> {
-  //   try {
-  //     const board = await transactionManager.findOne(Board, {
-  //       where: { id: id },
-  //     });
-
-  //     if (!board) {
-  //       throw new NotFoundException('board does not exist');
-  //     }
-
-  //     return board;
-  //   } catch (error) {
-  //     throw new HttpException(
-  //       {
-  //         message: 'SQL Error',
-  //         error: error.sqlMessage,
-  //       },
-  //       HttpStatus.FORBIDDEN,
-  //     );
-  //   }
-  // }
-
-  async getById(boardId: number): Promise<BoardDto> {
-    const boardDto: BoardDto = await this.findOne(boardId);
-    return boardDto;
+  async getById(boardId: number): Promise<Board> {
+    const board: Board = await this.findOne(boardId);
+    return board;
   }
 
   async getRelationById(boardId: number): Promise<RelationBoardDto> {
@@ -58,14 +30,8 @@ export class BoardRepository extends Repository<Board> {
     return relationBoardDto;
   }
 
-  async findById(boardId: number): Promise<BoardDto> {
-    const boardDto: BoardDto = await this.findById(boardId);
-    return boardDto;
-  }
-
   async createBoard(createBoardDto: CreateBoardDto): Promise<Board> {
     try {
-      //this.insert() return Promoise<InsertResult>
       const board = await this.save(createBoardDto);
 
       return board;
@@ -80,28 +46,24 @@ export class BoardRepository extends Repository<Board> {
     }
   }
 
-  async updateAuthorUndefined(userId: string): Promise<boolean> {
-    // try {
-    //   const deleteBoards = await this.update(userId, {
-    //     user,
-    //   });
+  async updateAuthorUndefined(user: UserActivityBoardDto): Promise<boolean> {
+    try {
+      const boards: Board[] = user.boards;
 
-    //   //deleteBoards DeleteResult { raw : [], affected : 1 }
-    //   if (deleteBoards.affected === 0) {
-    //     throw new NotFoundException('There is no boards to delete');
-    //   }
+      for (const board of boards) {
+        board.user = null;
+      }
 
-    //   return true;
-    // } catch (error) {
-    //   throw new HttpException(
-    //     {
-    //       message: 'SQL Error',
-    //       error: error.sqlMessage,
-    //     },
-    //     HttpStatus.FORBIDDEN,
-    //   );
-    // }
-    return true;
+      return true;
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: 'SQL Error',
+          error: error.sqlMessage,
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
   }
 
   async findByUserId(userId: string): Promise<BoardDto[]> {
@@ -323,5 +285,13 @@ export class BoardRepository extends Repository<Board> {
 
     const updatedBoard = await this.save(board);
     return updatedBoard;
+  }
+
+  async likeBoard(boardId: number): Promise<boolean> {
+    const board = await this.getById(boardId);
+    board.likes += 1;
+    board.save();
+
+    return true;
   }
 }

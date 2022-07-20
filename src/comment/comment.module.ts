@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BoardModule } from 'src/board/board.module';
 import { NotificationModule } from 'src/notification/notification.module';
 import { CommentRepository } from 'src/repository/comment.repository';
-import { UserActivityRepository } from 'src/repository/user-activity.repository';
+import { UserModule } from 'src/user/user.module';
 import { CommentController } from './comment.controller';
 import { CommentService } from './comment.service';
 
@@ -11,7 +11,8 @@ import { CommentService } from './comment.service';
   imports: [
     forwardRef(() => BoardModule),
     NotificationModule,
-    TypeOrmModule.forFeature([CommentRepository, UserActivityRepository]),
+    UserModule,
+    TypeOrmModule.forFeature([CommentRepository]),
   ],
   controllers: [CommentController],
   providers: [CommentService],

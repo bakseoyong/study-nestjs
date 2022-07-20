@@ -11,6 +11,7 @@ import { HashtagService } from 'src/hashtag/hashtag.service';
 import { CreateNotiDto } from 'src/notification/dto/create-noti.dto';
 import { NotificationService } from 'src/notification/notification.service';
 import { BoardRepository } from 'src/repository/board.repository';
+import { UserActivityBoardDto } from 'src/user/dto/user-activity-board.dto';
 import { UserService } from 'src/user/user.service';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { PaginationBoardDto, SortType } from './dto/pagination-boards.dto';
@@ -32,16 +33,13 @@ export class BoardService {
     private readonly notificationService: NotificationService,
   ) {}
 
-  getById(boardId: number): Promise<BoardDto> {
-    return this.boardRepository.getById(boardId);
+  async getById(boardId: number): Promise<BoardDto> {
+    const boardDto: BoardDto = await this.boardRepository.getById(boardId);
+    return boardDto;
   }
 
   getRelationById(boardId: number): Promise<RelationBoardDto> {
-    return this.boardRepository.getRelationById(boardId);
-  }
-
-  findById(boardId: number): Promise<BoardDto> {
-    return this.boardRepository.findById(boardId);
+    return this.boardRepository.getById(boardId);
   }
 
   async createBoard(
@@ -76,8 +74,10 @@ export class BoardService {
     return returnBoard;
   }
 
-  setAuthorUndefined(userId: string): Promise<boolean> {
-    return this.boardRepository.updateAuthorUndefined(userId);
+  async setAuthorUndefined(userId: string): Promise<boolean> {
+    const user: UserActivityBoardDto =
+      await this.userService.getActivityBoardById(userId);
+    return this.boardRepository.updateAuthorUndefined(user);
   }
 
   findByUserId(userId: string): Promise<BoardDto[]> {
@@ -148,8 +148,10 @@ export class BoardService {
     );
 
     this.hashtagService.updateBoardHashtags({ board, hashtags });
-    // this.hashtagService.deleteBoardHashtags(boardId);
-    // this.hashtagService.createBoardHashtags();
     return true;
+  }
+
+  likeBoard(boardId: number): Promise<boolean> {
+    return this.boardRepository.likeBoard(boardId);
   }
 }

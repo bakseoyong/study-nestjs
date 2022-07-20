@@ -9,6 +9,7 @@ import { UserRepository } from 'src/repository/user.repository';
 import { CreateUserDto } from './dto/createUser.dto';
 import { FollowersDto } from './dto/followers.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
+import { UserActivityBoardDto } from './dto/user-activity-board.dto';
 import { UserActivityDto } from './dto/user-activity.dto';
 
 @Injectable()
@@ -56,6 +57,10 @@ export class UserService {
   }
 
   getActivityById(userId: string): Promise<UserActivityDto> {
+    return this.userActivityRepository.getById(userId);
+  }
+
+  getActivityBoardById(userId: string): Promise<UserActivityBoardDto> {
     return this.userActivityRepository.getById(userId);
   }
 
