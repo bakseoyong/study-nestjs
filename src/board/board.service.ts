@@ -154,27 +154,34 @@ export class BoardService {
   }
 
   async likeBoard(userId: string, boardId: number): Promise<number> {
-    //유실되면 안됨.
-    this.redis.multi();
-    let likeCnt: number = +(await this.redis.get(`likeCnt:${boardId}`));
-    let saved: Date = new Date(await this.redis.get(`likeSaved:${boardId}`));
-    if (!likeCnt) {
-      const board = await this.boardRepository.getById(boardId);
-      likeCnt = board.likeCount;
-      saved = new Date();
-      await this.redis.set(`likeSaved:${boardId}`, saved.toString());
-    }
-    if (new Date().getTime() - saved.getTime() >= 1000 * 60 * 10) {
-      const board = await this.boardRepository.getById(boardId);
-      board.likeCount = likeCnt;
-      board.save();
-      this.redis.del(`likeCount:${boardId}`);
-      this.redis.set(`likeSaved:${boardId}`, new Date().getTime());
-    }
-    await this.redis.set(`likeCount:${boardId}`, likeCnt + 1);
-    this.redis.exec();
-    return likeCnt + 1;
+    this.redis.sadd(`likes:${boardId}`, userId);
+    return this.redis.scard(`likes:${boardId}`);
   }
+
+  //중복이 되면 안되는데 지금은 중복되고 있음. => set으로 구현하고 likeCnt를 1 올리는게 아니라
+  // async likeBoard(userId: string, boardId: number): Promise<number> {
+  //   //this.redis.sadd('a', [1, 2, 3]);
+  //   //유실되면 안됨.
+  //   this.redis.multi();
+  //   let likeCnt: number = +(await this.redis.get(`likeCnt:${boardId}`));
+  //   let saved: Date = new Date(await this.redis.get(`likeSaved:${boardId}`));
+  //   if (!likeCnt) {
+  //     const board = await this.boardRepository.getById(boardId);
+  //     likeCnt = board.likeCount;
+  //     saved = new Date();
+  //     await this.redis.set(`likeSaved:${boardId}`, saved.toString());
+  //   }
+  //   if (new Date().getTime() - saved.getTime() >= 1000 * 60 * 10) {
+  //     const board = await this.boardRepository.getById(boardId);
+  //     board.likeCount = likeCnt;
+  //     board.save();
+  //     this.redis.del(`likeCount:${boardId}`);
+  //     this.redis.set(`likeSaved:${boardId}`, new Date().getTime());
+  //   }
+  //   await this.redis.set(`likeCount:${boardId}`, likeCnt + 1);
+  //   this.redis.exec();
+  //   return likeCnt + 1;
+  // }
 
   async viewBoard(boardId: number): Promise<number> {
     //어느정도 유실되어도 된다.

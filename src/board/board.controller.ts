@@ -161,6 +161,6 @@ export class BoardController {
   @Get('/like/:id')
   @UseGuards(JwtAuthGuard)
   likeBoard(@Req() req, @Param('id') boardId): void {
-    // return this.boardService.likeBoard(req.user.id, boardId);
+    return this.boardService.likeBoard(req.user.id, boardId);
   }
 }
