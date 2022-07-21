@@ -12,9 +12,15 @@ import { FollowModule } from './follow/follow.module';
 import { UploadModule } from './upload/upload.module';
 import { NoteModule } from './note/note.module';
 import { CommentModule } from './comment/comment.module';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
   imports: [
+    RedisModule.forRoot({
+      config: {
+        url: 'redis://127.0.0.1:6379',
+      },
+    }),
     TypeOrmModule.forRoot(typeORMConfig),
     UserModule,
     AuthModule,

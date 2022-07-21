@@ -1,11 +1,4 @@
-import {
-  CACHE_MANAGER,
-  forwardRef,
-  Inject,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
-import { Cache } from 'cache-manager';
+import { Injectable, Logger } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
 import { BoardDto } from 'src/entity/dto/board.dto';
 import { RelationBoardDto } from 'src/entity/dto/relation-board.dto';
@@ -24,6 +17,7 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { PaginationBoardDto, SortType } from './dto/pagination-boards.dto';
 import { ScrapBoardDto } from './dto/scrap-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
+import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 
 @Injectable()
 export class BoardService {
@@ -34,7 +28,9 @@ export class BoardService {
     private readonly hashtagService: HashtagService,
     private readonly notificationService: NotificationService,
 
-    @Inject(CACHE_MANAGER) private readonly cacheMananger: Cache,
+    // @Inject(CACHE_MANAGER) private readonly cacheMananger: Cache,
+    //private readonly redisCacheService: RedisCacheService,
+    @InjectRedis() private readonly redis: Redis,
   ) {}
 
   async getById(boardId: number): Promise<BoardDto> {
@@ -157,28 +153,48 @@ export class BoardService {
     return true;
   }
 
-  likeBoard(boardId: number): Promise<boolean> {
-    return this.boardRepository.likeBoard(boardId);
+  async likeBoard(userId: string, boardId: number): Promise<number> {
+    //유실되면 안됨.
+    this.redis.multi();
+    let likeCnt: number = +(await this.redis.get(`likeCnt:${boardId}`));
+    let saved: Date = new Date(await this.redis.get(`likeSaved:${boardId}`));
+    if (!likeCnt) {
+      const board = await this.boardRepository.getById(boardId);
+      likeCnt = board.likeCount;
+      saved = new Date();
+      await this.redis.set(`likeSaved:${boardId}`, saved.toString());
+    }
+    if (new Date().getTime() - saved.getTime() >= 1000 * 60 * 10) {
+      const board = await this.boardRepository.getById(boardId);
+      board.likeCount = likeCnt;
+      board.save();
+      this.redis.del(`likeCount:${boardId}`);
+      this.redis.set(`likeSaved:${boardId}`, new Date().getTime());
+    }
+    await this.redis.set(`likeCount:${boardId}`, likeCnt + 1);
+    this.redis.exec();
+    return likeCnt + 1;
   }
 
   async viewBoard(boardId: number): Promise<number> {
-    let viewCnt: number = await this.cacheMananger.get(`viewCnt:${boardId}`);
-    let saved: Date = await this.cacheMananger.get(`saved:${boardId}`);
+    //어느정도 유실되어도 된다.
+    let viewCnt: number = +(await this.redis.get(`viewCnt:${boardId}`));
+    let saved: Date = new Date(await this.redis.get(`saved:${boardId}`));
     if (!viewCnt) {
       const board = await this.boardRepository.getById(boardId);
       viewCnt = board.viewCount;
       saved = new Date();
-      await this.cacheMananger.set(`saved:${boardId}`, saved);
+      await this.redis.set(`saved:${boardId}`, saved.toString());
     }
     if (new Date().getTime() - saved.getTime() >= 1000 * 60 * 10) {
       const board = await this.boardRepository.getById(boardId);
       board.viewCount = viewCnt;
       board.save();
-      this.cacheMananger.del(`viewCnt:${boardId}`);
-      this.cacheMananger.set(`saved:${boardId}`, new Date().getTime());
+      this.redis.del(`viewCnt:${boardId}`);
+      this.redis.set(`saved:${boardId}`, new Date().getTime());
     }
     //Logger.log(saved);
-    await this.cacheMananger.set(`viewCnt:${boardId}`, viewCnt + 1);
+    await this.redis.set(`viewCnt:${boardId}`, viewCnt + 1);
     return viewCnt + 1;
   }
 }

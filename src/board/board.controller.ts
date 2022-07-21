@@ -18,7 +18,12 @@ import { BoardService } from './board.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { PaginationBoardDto } from './dto/pagination-boards.dto';
 import { ScrapBoardDto } from './dto/scrap-board.dto';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiProperty,
+  ApiTags,
+} from '@nestjs/swagger';
 import { User } from 'src/entity/user.entity';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { BoardDto } from 'src/entity/dto/board.dto';
@@ -147,5 +152,15 @@ export class BoardController {
     @Param() param,
   ): Promise<boolean> {
     return this.boardService.updateBoard(req.user.id, updateBoardDto, param.id);
+  }
+
+  @ApiOperation({
+    summary: '게시글 좋아요 API',
+    description: '게시글을 추천합니다',
+  })
+  @Get('/like/:id')
+  @UseGuards(JwtAuthGuard)
+  likeBoard(@Req() req, @Param('id') boardId): void {
+    // return this.boardService.likeBoard(req.user.id, boardId);
   }
 }

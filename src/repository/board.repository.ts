@@ -24,11 +24,6 @@ export class BoardRepository extends Repository<Board> {
     return board;
   }
 
-  async getRelationById(boardId: number): Promise<RelationBoardDto> {
-    const relationBoardDto: RelationBoardDto = await this.findOne(boardId);
-    return relationBoardDto;
-  }
-
   async createBoard(createBoardDto: CreateBoardDto): Promise<Board> {
     try {
       const board = await this.save(createBoardDto);
@@ -65,13 +60,11 @@ export class BoardRepository extends Repository<Board> {
     }
   }
 
-  async findByUserId(userId: string): Promise<BoardDto[]> {
+  async findByUserId(userId: string): Promise<Board[]> {
     try {
-      const boardDtos: BoardDto[] = await this.find({
+      return await this.find({
         where: { author: userId },
       });
-
-      return boardDtos;
     } catch (error) {
       throw new HttpException(
         {
@@ -89,14 +82,14 @@ export class BoardRepository extends Repository<Board> {
   ): Promise<number> {
     try {
       await this.update(id, {
-        likes: () => 'likes + 1',
+        likeCount: () => 'likeCount + 1',
       });
 
       const board = await transactionManager.findOne(Board, {
         where: { id: id },
       });
-      Logger.log(`recommendBoard SQL result set : ${board.likes}`);
-      return board.likes;
+      Logger.log(`recommendBoard SQL result set : ${board.likeCount}`);
+      return board.likeCount;
     } catch (error) {
       throw new HttpException(
         {
@@ -284,13 +277,5 @@ export class BoardRepository extends Repository<Board> {
 
     const updatedBoard = await this.save(board);
     return updatedBoard;
-  }
-
-  async likeBoard(boardId: number): Promise<boolean> {
-    const board = await this.getById(boardId);
-    board.likes += 1;
-    board.save();
-
-    return true;
   }
 }

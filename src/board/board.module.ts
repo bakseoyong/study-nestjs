@@ -1,4 +1,4 @@
-import { CacheModule, forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RedisCacheModule } from 'src/cache/redis-cache.module';
 import { HashtagModule } from 'src/hashtag/hashtag.module';
@@ -14,9 +14,10 @@ import { BoardService } from './board.service';
     NotificationModule,
     UserModule,
     TypeOrmModule.forFeature([BoardRepository]),
-    CacheModule.register({
-      ttl: 60 * 11,
-    }),
+    // CacheModule.register({
+    //   ttl: 60 * 11,
+    // }),
+    //RedisCacheModule,
   ],
   providers: [BoardService],
   controllers: [BoardController],

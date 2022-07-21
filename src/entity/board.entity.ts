@@ -38,7 +38,7 @@ export class Board extends BaseEntity {
   viewCount: number;
 
   @Column({ type: 'integer', default: 0, comment: 'likes' })
-  likes: number;
+  likeCount: number;
 
   @IsString()
   @IsNotEmpty()
@@ -80,7 +80,6 @@ export class Board extends BaseEntity {
     const board = new Board();
     board.id = boardDto.id;
     board.user = boardDto.user;
-    board.likes = boardDto.likes;
     board.title = boardDto.title;
     board.content = boardDto.content;
     board.created = boardDto.created;
