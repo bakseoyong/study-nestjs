@@ -7,8 +7,6 @@ export class RelationBoardDto {
 
   user: UserActivityDto;
 
-  likes: number;
-
   title: string;
 
   content: string;

@@ -1,4 +1,4 @@
-import { CacheModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeORMConfig } from './configs/typeorm.config';
 import { UserModule } from './user/user.module';
@@ -10,12 +10,17 @@ import { NotificationModule } from './notification/notification.module';
 import { HashtagModule } from './hashtag/hashtag.module';
 import { FollowModule } from './follow/follow.module';
 import { UploadModule } from './upload/upload.module';
-import { RedisCacheModule } from './cache/redis-cache.module';
 import { NoteModule } from './note/note.module';
 import { CommentModule } from './comment/comment.module';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
   imports: [
+    RedisModule.forRoot({
+      config: {
+        url: 'redis://127.0.0.1:6379',
+      },
+    }),
     TypeOrmModule.forRoot(typeORMConfig),
     UserModule,
     AuthModule,
@@ -25,7 +30,7 @@ import { CommentModule } from './comment/comment.module';
     HashtagModule,
     FollowModule,
     UploadModule,
-    CacheModule.register(),
+    //CacheModule.register(),
     NoteModule,
     CommentModule,
   ],

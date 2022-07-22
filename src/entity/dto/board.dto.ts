@@ -5,8 +5,6 @@ export class BoardDto {
 
   user: UserActivity;
 
-  likes: number;
-
   title: string;
 
   content: string;

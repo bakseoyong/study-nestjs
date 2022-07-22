@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserRepository } from 'src/repository/user.repository';
+import { UserModule } from 'src/user/user.module';
 import { AuthService } from './auth.service';
 import { jwtConstants } from './constants';
 import { JwtStrategy } from './starategies/auth.jwt.strategy';
@@ -10,7 +10,7 @@ import { LocalStrategy } from './starategies/auth.local.strategy';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserRepository]),
+    UserModule,
     PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
