@@ -1,3 +1,4 @@
+import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { Injectable, Logger } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
 import { BoardDto } from 'src/entity/dto/board.dto';
@@ -17,7 +18,6 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { PaginationBoardDto, SortType } from './dto/pagination-boards.dto';
 import { ScrapBoardDto } from './dto/scrap-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
-import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 
 @Injectable()
 export class BoardService {
@@ -26,10 +26,7 @@ export class BoardService {
 
     private readonly userService: UserService,
     private readonly hashtagService: HashtagService,
-    private readonly notificationService: NotificationService,
-
-    // @Inject(CACHE_MANAGER) private readonly cacheMananger: Cache,
-    //private readonly redisCacheService: RedisCacheService,
+    private readonly notificationService: NotificationService, // @Inject(CACHE_MANAGER) private readonly cacheMananger: Cache, //private readonly redisCacheService: RedisCacheService,
     @InjectRedis() private readonly redis: Redis,
   ) {}
 

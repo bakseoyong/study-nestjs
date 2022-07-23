@@ -52,6 +52,9 @@ export class UserActivity extends BaseEntity {
   @OneToMany((type) => Board, (board) => board.user)
   boards: Board[];
 
+  @ApiProperty({})
+  chatRooms: number[];
+
   static from(userActivityDto: UserActivityDto): UserActivity {
     const userActivity = new UserActivity();
     userActivity.id = userActivityDto.id;

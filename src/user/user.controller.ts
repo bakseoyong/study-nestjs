@@ -30,7 +30,7 @@ export class UserController {
   })
   @Post('/create-user')
   @UsePipes(ValidationPipe)
-  createUser(@Body() createUserDto: CreateUserDto): Promise<boolean> {
+  createUser(@Body() createUserDto: CreateUserDto): Promise<UserProfile> {
     return this.userService.createUser(createUserDto);
   }
 

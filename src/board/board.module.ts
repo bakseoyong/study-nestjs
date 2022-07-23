@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RedisCacheModule } from 'src/cache/redis-cache.module';
 import { HashtagModule } from 'src/hashtag/hashtag.module';
 import { NotificationModule } from 'src/notification/notification.module';
 import { BoardRepository } from 'src/repository/board.repository';

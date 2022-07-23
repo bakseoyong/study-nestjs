@@ -6,6 +6,7 @@ import { User } from 'src/entity/user.entity';
 import { UserActivityRepository } from 'src/repository/user-activity.repository';
 import { UserProfileRepository } from 'src/repository/user-profile.repository';
 import { UserRepository } from 'src/repository/user.repository';
+import { ChatRoomsDto } from './dto/chat-rooms.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { FollowersDto } from './dto/followers.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
@@ -21,7 +22,7 @@ export class UserService {
     private readonly userActivityRepository: UserActivityRepository,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<boolean> {
+  async createUser(createUserDto: CreateUserDto): Promise<UserProfile> {
     const userProfile = await this.userProfileRepository.createUser(
       createUserDto,
     );
@@ -35,7 +36,7 @@ export class UserService {
     await this.userRepository.save(user);
     await this.userActivityRepository.save(userActivity);
 
-    return true;
+    return userProfile;
   }
 
   updateUserProfile(
@@ -66,5 +67,18 @@ export class UserService {
 
   getFollowers(userId: string): Promise<FollowersDto> {
     return this.userActivityRepository.getById(userId);
+  }
+
+  getChatRooms(userId: string): Promise<ChatRoomsDto> {
+    return this.userActivityRepository.getById(userId);
+  }
+
+  async addChatRooms(userId: string, roomId: number): Promise<boolean> {
+    const user: UserActivity = await this.userActivityRepository.getById(
+      userId,
+    );
+    user.chatRooms.push(roomId);
+    user.save();
+    return true;
   }
 }

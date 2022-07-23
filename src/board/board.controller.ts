@@ -18,12 +18,7 @@ import { BoardService } from './board.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { PaginationBoardDto } from './dto/pagination-boards.dto';
 import { ScrapBoardDto } from './dto/scrap-board.dto';
-import {
-  ApiCreatedResponse,
-  ApiOperation,
-  ApiProperty,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from 'src/entity/user.entity';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { BoardDto } from 'src/entity/dto/board.dto';
@@ -160,7 +155,7 @@ export class BoardController {
   })
   @Get('/like/:id')
   @UseGuards(JwtAuthGuard)
-  likeBoard(@Req() req, @Param('id') boardId): void {
+  likeBoard(@Req() req, @Param('id') boardId): Promise<number> {
     return this.boardService.likeBoard(req.user.id, boardId);
   }
 }
