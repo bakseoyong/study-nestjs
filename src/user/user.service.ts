@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Room } from 'src/entity/room.entity';
 import { UserActivity } from 'src/entity/user-activity.entity';
 import { UserProfile } from 'src/entity/user-profile.entity';
 import { User } from 'src/entity/user.entity';
@@ -73,11 +74,16 @@ export class UserService {
     return this.userActivityRepository.getById(userId);
   }
 
-  async addChatRooms(userId: string, roomId: number): Promise<boolean> {
+  async addChatRooms(
+    userId: string,
+    partner: string,
+    roomId: number,
+  ): Promise<boolean> {
     const user: UserActivity = await this.userActivityRepository.getById(
       userId,
     );
-    user.chatRooms.push(roomId);
+    const chatRoom = Room.from(roomId, partner);
+    user.chatRooms.push(chatRoom);
     user.save();
     return true;
   }

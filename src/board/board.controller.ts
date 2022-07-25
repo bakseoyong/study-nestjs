@@ -10,7 +10,6 @@ import {
   Req,
   Query,
   Patch,
-  Logger,
 } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
 import { CreateBoardDto } from './dto/create-board.dto';
@@ -36,9 +35,7 @@ export class BoardController {
   @ApiCreatedResponse({ description: '게시글을 조회합니다.', type: User })
   @Get('/view/:id')
   //@Render('view.ejs')
-  async getRelationById(@Param('id') id: number): Promise<RelationBoardDto> {
-    const viewCount = await this.boardService.viewBoard(id);
-    Logger.log(viewCount);
+  getRelationById(@Param('id') id: number): Promise<RelationBoardDto> {
     return this.boardService.getRelationById(id);
   }
 
@@ -46,14 +43,14 @@ export class BoardController {
     summary: '게시글 생성 API',
     description: '게시글을 생성합니다.',
   })
-  @Post('/create-board')
+  @Post('/create')
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
-  createBoard(
+  create(
     @Body() createBoardDto: CreateBoardDto,
     @Req() req,
   ): Promise<BoardDto> {
-    return this.boardService.createBoard(createBoardDto, req.user.id);
+    return this.boardService.create(createBoardDto, req.user.id);
   }
 
   @ApiOperation({
@@ -144,9 +141,10 @@ export class BoardController {
   updateBoard(
     @Req() req,
     @Body() updateBoardDto: UpdateBoardDto,
-    @Param() param,
+    @Param('id') boardId,
   ): Promise<boolean> {
-    return this.boardService.updateBoard(req.user.id, updateBoardDto, param.id);
+    this.boardService.checkAuthor(req.user.id, boardId);
+    return this.boardService.updateBoard(updateBoardDto, boardId);
   }
 
   @ApiOperation({

@@ -11,6 +11,10 @@ export class RelationBoardDto {
 
   content: string;
 
+  likeCount: number;
+
+  viewCount: number;
+
   created: Date;
 
   updated: Date;

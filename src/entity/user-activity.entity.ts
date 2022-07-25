@@ -14,6 +14,7 @@ import { Board } from './board.entity';
 import { Comment } from './comment.entity';
 import { Follow } from './follow.entity';
 import { Notification } from './notification.entity';
+import { Room } from './room.entity';
 import { Scrap } from './scrap.entity';
 import { User } from './user.entity';
 
@@ -53,7 +54,7 @@ export class UserActivity extends BaseEntity {
   boards: Board[];
 
   @ApiProperty({})
-  chatRooms: number[];
+  chatRooms: Room[];
 
   static from(userActivityDto: UserActivityDto): UserActivity {
     const userActivity = new UserActivity();

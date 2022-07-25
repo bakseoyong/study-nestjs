@@ -1,9 +1,10 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { UserService } from 'src/user/user.service';
 import { SendChatDto } from './dto/send-chat.dto';
-import { Cache } from 'cache-manager';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
+import { ChatListDto } from './dto/chat-list.dto';
+import { Room } from 'src/entity/room.entity';
 
 @Injectable()
 export class ChatService {
@@ -28,7 +29,7 @@ export class ChatService {
     //json to string
     this.redis.rpush(`chat:${roomId}`, JSON.stringify(object));
 
-    this.userService.addChatRooms(userId, roomId);
+    this.userService.addChatRooms(userId, receiver, roomId);
   }
 
   sendChat(userId: string, sendChatDto: SendChatDto): void {
@@ -47,5 +48,37 @@ export class ChatService {
     };
 
     this.redis.rpush(`chat:${roomId}`, JSON.stringify(object));
+  }
+
+  async showChatList(userId: string): Promise<ChatListDto[]> {
+    const rooms: Room[] = await (
+      await this.userService.getChatRooms(userId)
+    ).chatRooms;
+
+    const chatList: ChatListDto[] = [];
+    for (const room of rooms) {
+      const partner = room.partner;
+      const parse = JSON.parse(this.redis.lrange(`chat:${room.id}`, -1, -1));
+      const lastSended = parse.created;
+      const lastContent = parse.content;
+      const chat: ChatListDto = {
+        partner: partner,
+        lastSended: lastSended,
+        lastContent: lastContent,
+      };
+      chatList.push(chat);
+    }
+
+    return chatList;
+  }
+
+  async deleteChat(userId: string, chatId: number): Promise<boolean> {
+    const rooms: Room[] = await (
+      await this.userService.getChatRooms(userId)
+    ).chatRooms;
+
+    const index = rooms.findIndex((element) => element.id === chatId);
+    rooms.splice(index, 1);
+    return true;
   }
 }

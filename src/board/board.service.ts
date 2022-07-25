@@ -1,5 +1,5 @@
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
 import { BoardDto } from 'src/entity/dto/board.dto';
 import { RelationBoardDto } from 'src/entity/dto/relation-board.dto';
@@ -13,6 +13,7 @@ import { CreateNotiDto } from 'src/notification/dto/create-noti.dto';
 import { NotificationService } from 'src/notification/notification.service';
 import { BoardRepository } from 'src/repository/board.repository';
 import { UserActivityBoardDto } from 'src/user/dto/user-activity-board.dto';
+import { UserActivityDto } from 'src/user/dto/user-activity.dto';
 import { UserService } from 'src/user/user.service';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { PaginationBoardDto, SortType } from './dto/pagination-boards.dto';
@@ -35,11 +36,18 @@ export class BoardService {
     return boardDto;
   }
 
-  getRelationById(boardId: number): Promise<RelationBoardDto> {
-    return this.boardRepository.getById(boardId);
+  //getRelationById도 결국 getById에 viewcount더한건데 getById를
+  //이렇게 만들어야하는거 아닐까
+  async getRelationById(boardId: number): Promise<RelationBoardDto> {
+    const viewCount = await this.viewBoard(boardId);
+    const relationBoardDto: RelationBoardDto =
+      await this.boardRepository.getById(boardId);
+    relationBoardDto.viewCount = viewCount;
+
+    return relationBoardDto;
   }
 
-  async createBoard(
+  async create(
     createBoardDto: CreateBoardDto,
     userId: string,
   ): Promise<BoardDto> {
@@ -47,9 +55,17 @@ export class BoardService {
       createBoardDto.tagNames,
     );
 
-    const board: BoardDto = await this.boardRepository.createBoard(
-      createBoardDto,
+    const user: UserActivity = UserActivity.from(
+      await this.userService.getActivityById(userId),
     );
+
+    const { title, content, ...other } = createBoardDto;
+
+    const board = new Board();
+    board.user = user;
+    board.title = title;
+    board.content = content;
+    await this.boardRepository.save(board);
 
     const createBoardHashtagDto: CreateBoardHashtagDto = { board, hashtags };
 
@@ -132,12 +148,10 @@ export class BoardService {
   }
 
   async updateBoard(
-    userId: string,
     updateBoardDto: UpdateBoardDto,
     boardId: number,
   ): Promise<boolean> {
     const board: BoardDto = await this.boardRepository.updateBoard(
-      userId,
       updateBoardDto,
       boardId,
     );
@@ -200,5 +214,19 @@ export class BoardService {
     //Logger.log(saved);
     await this.redis.set(`viewCnt:${boardId}`, viewCnt + 1);
     return viewCnt + 1;
+  }
+
+  async checkAuthor(userId: string, boardId: number): Promise<boolean> {
+    const user: UserActivityDto = await this.userService.getActivityById(
+      userId,
+    );
+
+    const board = await this.boardRepository.getById(boardId);
+
+    if (user === UserActivity.to(board.user)) {
+      return true;
+    } else {
+      throw new BadRequestException();
+    }
   }
 }

@@ -6,6 +6,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { TimeInterval } from 'rxjs/internal/operators/timeInterval';
 import {
   BaseEntity,
   Column,
@@ -86,5 +87,10 @@ export class Board extends BaseEntity {
     board.updated = boardDto.updated;
     board.deleted = boardDto.deleted;
     return board;
+  }
+
+  update(title: string, content: string) {
+    this.title = title;
+    this.content = content;
   }
 }
