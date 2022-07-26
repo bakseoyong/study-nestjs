@@ -2,16 +2,14 @@ import {
   Body,
   Controller,
   Get,
-  Logger,
+  Param,
   Post,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { Notification } from 'src/entity/notification.entity';
 import { CreateNotiDto } from './dto/create-noti.dto';
-import { NewBoardNotiToFollowersDto } from './dto/new-board-noti-to-followers.dto';
 import { NotificationService } from './notification.service';
 
 @ApiTags('알림 API')
@@ -24,20 +22,48 @@ export class NotificationController {
     description: '알림 타입에 맞춰 알림을 생성합니다.',
   })
   @Post('/create')
-  createNoti(@Body() createNotiDto: CreateNotiDto): Promise<boolean> {
-    return this.notificationService.createNoti(createNotiDto);
+  create(@Body() createNotiDto: CreateNotiDto): boolean {
+    return this.notificationService.create(createNotiDto);
   }
 
   @ApiOperation({
-    summary: '알림 조회 API',
-    description: '유저에게 전송된 알림들을 조회합니다.',
+    summary: '알림 읽음 API',
+    description: '알림을 읽음 표시 합니다.',
   })
-  @Get('/get-notifications')
+  @Post('/read/:id')
   @UseGuards(JwtAuthGuard)
-  getNotifications(@Req() req): Promise<Notification[]> {
-    return this.notificationService.getNotifications(req.user.id);
+  readOne(@Param('id') id: number): Promise<boolean> {
+    return this.notificationService.readOne(id);
   }
 
-  // @Post('/checked')
-  // setCheckedNotification()
+  @ApiOperation({
+    summary: '알림 전체 읽음 API',
+    description: '알림 전체를 읽음 표시 합니다.',
+  })
+  @Get('/readAll')
+  @UseGuards(JwtAuthGuard)
+  readAll(@Req() req): Promise<boolean> {
+    return this.notificationService.readAll(req.user.id);
+  }
+
+  //개별 알림 삭제
+  @ApiOperation({
+    summary: '알림 삭제 API',
+    description: '알림을 삭제합니다.',
+  })
+  @Get('/delete/:id')
+  @UseGuards(JwtAuthGuard)
+  deleteOne(@Param('id') id): Promise<boolean> {
+    return this.notificationService.deleteOne(id);
+  }
+
+  @ApiOperation({
+    summary: '읽은 알림 삭제 API',
+    description: '읽은 알림들을 삭제합니다.',
+  })
+  @Get('/delete-read')
+  @UseGuards(JwtAuthGuard)
+  deleteRead(@Req() req): Promise<boolean> {
+    return this.notificationService.deleteRead(req.user.id);
+  }
 }

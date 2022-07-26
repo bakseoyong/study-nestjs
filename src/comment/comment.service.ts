@@ -1,14 +1,12 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { BoardService } from 'src/board/board.service';
-import { Board } from 'src/entity/board.entity';
-import { BoardDto } from 'src/entity/dto/board.dto';
+import { Comment } from 'src/entity/comment.entity';
 import { NotificationType } from 'src/entity/notification.entity';
 import { UserActivity } from 'src/entity/user-activity.entity';
 import { CreateNotiDto } from 'src/notification/dto/create-noti.dto';
 import { NotificationService } from 'src/notification/notification.service';
 import { CommentRepository } from 'src/repository/comment.repository';
 import { UserActivityRepository } from 'src/repository/user-activity.repository';
-import { UserActivityDto } from 'src/user/dto/user-activity.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 
 @Injectable()
@@ -22,19 +20,22 @@ export class CommentService {
     private readonly notificationService: NotificationService,
   ) {}
 
-  async createComment(
+  async create(
     boardId: number,
     createCommentDto: CreateCommentDto,
     userId: string,
   ): Promise<boolean> {
-    const boardDto: BoardDto = await this.boardService.getById(boardId);
-    const userActivityDto: UserActivityDto =
-      await this.userActivityRepository.getById(userId);
+    const board = await this.boardService.getById(boardId);
+    const user: UserActivity = await this.userActivityRepository.getById(
+      userId,
+    );
     const { content } = createCommentDto;
-    const board = Board.from(boardDto);
-    const user = UserActivity.from(userActivityDto);
 
-    this.commentRepository.createComment(board, content, user);
+    const comment = new Comment();
+    comment.board = board;
+    comment.user = user;
+    comment.content = content;
+    this.commentRepository.save(comment);
 
     const followers = user.followers.map((follow) =>
       UserActivity.to(follow.from),
@@ -47,7 +48,7 @@ export class CommentService {
       notiType: NotificationType.WRITE_BOARD_COMMENT,
     };
 
-    await this.notificationService.createNoti(createNotiDto);
+    await this.notificationService.create(createNotiDto);
 
     return true;
   }

@@ -29,10 +29,6 @@ export class CommentController {
     @Body() createCommentDto: CreateCommentDto,
     @Req() req,
   ): Promise<boolean> {
-    return this.commentService.createComment(
-      param.id,
-      createCommentDto,
-      req.user.id,
-    );
+    return this.commentService.create(param.id, createCommentDto, req.user.id);
   }
 }
