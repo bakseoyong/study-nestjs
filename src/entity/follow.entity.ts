@@ -1,13 +1,11 @@
 import {
   BaseEntity,
-  Column,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
 import { UserActivity } from './user-activity.entity';
-import { User } from './user.entity';
 
 @Entity({ name: 'follows' })
 @Unique(['id'])

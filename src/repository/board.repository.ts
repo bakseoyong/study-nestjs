@@ -1,6 +1,10 @@
-import { HttpException, HttpStatus, Logger } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { Board } from 'src/entity/board.entity';
-import { CreateBoardDto } from 'src/board/dto/create-board.dto';
 import {
   EntityManager,
   EntityRepository,
@@ -12,32 +16,15 @@ import {
 import { PaginationBoardDto } from 'src/board/dto/pagination-boards.dto';
 import { Scrap } from 'src/entity/scrap.entity';
 import { UpdateBoardDto } from 'src/board/dto/update-board.dto';
-import { BoardDto } from 'src/entity/dto/board.dto';
-import { RelationBoardDto } from 'src/entity/dto/relation-board.dto';
 import { UserActivityDto } from 'src/user/dto/user-activity.dto';
 import { UserActivityBoardDto } from 'src/user/dto/user-activity-board.dto';
+import _ from 'lodash';
 
 @EntityRepository(Board) //@EntityRepository deprecated in typeorm@^0.3.6
 export class BoardRepository extends Repository<Board> {
   async getById(boardId: number): Promise<Board> {
     const board: Board = await this.findOne(boardId);
     return board;
-  }
-
-  async createBoard(createBoardDto: CreateBoardDto): Promise<Board> {
-    try {
-      const board = await this.save(createBoardDto);
-
-      return board;
-    } catch (error) {
-      throw new HttpException(
-        {
-          message: 'SQL Error',
-          error: error.sqlMessage,
-        },
-        HttpStatus.FORBIDDEN,
-      );
-    }
   }
 
   async updateAuthorUndefined(user: UserActivityBoardDto): Promise<boolean> {
@@ -49,22 +36,6 @@ export class BoardRepository extends Repository<Board> {
       }
 
       return true;
-    } catch (error) {
-      throw new HttpException(
-        {
-          message: 'SQL Error',
-          error: error.sqlMessage,
-        },
-        HttpStatus.FORBIDDEN,
-      );
-    }
-  }
-
-  async findByUserId(userId: string): Promise<Board[]> {
-    try {
-      return await this.find({
-        where: { author: userId },
-      });
     } catch (error) {
       throw new HttpException(
         {
@@ -264,7 +235,6 @@ export class BoardRepository extends Repository<Board> {
   }
 
   async updateBoard(
-    userId: string,
     updateBoardDto: UpdateBoardDto,
     boardId: number,
   ): Promise<Board> {
@@ -272,10 +242,12 @@ export class BoardRepository extends Repository<Board> {
 
     const board = await this.findOne(boardId);
 
-    board.title = title;
-    board.content = content;
+    if (_.isEmpty(board) === true) {
+      throw new NotFoundException();
+    }
 
-    const updatedBoard = await this.save(board);
-    return updatedBoard;
+    board.update(title, content);
+
+    return this.save(board);
   }
 }

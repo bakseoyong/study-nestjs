@@ -1,17 +1,9 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  Unique,
-} from 'typeorm';
-import { BoardHashtag } from './board-hashtag.entity';
-import { User } from './user.entity';
+import { BaseEntity, CreateDateColumn, PrimaryGeneratedColumn } from 'typeorm';
 
-//NoSql
 export class Note extends BaseEntity {
-  creator: User;
-  receiver: User;
-  content: string;
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @CreateDateColumn()
+  created: Date;
 }

@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 import { User } from 'src/entity/user.entity';
 
-export class CreateNoteDto {
+export class CreateChatDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(10)
@@ -9,5 +9,5 @@ export class CreateNoteDto {
   content: string;
 
   @IsNotEmpty()
-  receiver: User;
+  receiver: string;
 }
