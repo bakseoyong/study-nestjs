@@ -47,22 +47,6 @@ export class BoardRepository extends Repository<Board> {
     }
   }
 
-  async findByUserId(userId: string): Promise<Board[]> {
-    try {
-      return await this.find({
-        where: { author: userId },
-      });
-    } catch (error) {
-      throw new HttpException(
-        {
-          message: 'SQL Error',
-          error: error.sqlMessage,
-        },
-        HttpStatus.FORBIDDEN,
-      );
-    }
-  }
-
   async recommendBoard(
     @TransactionManager() transactionManager: EntityManager,
     id: number,

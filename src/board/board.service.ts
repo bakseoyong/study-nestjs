@@ -95,10 +95,6 @@ export class BoardService {
     return this.boardRepository.updateAuthorUndefined(user);
   }
 
-  findByUserId(userId: string): Promise<BoardDto[]> {
-    return this.boardRepository.findByUserId(userId);
-  }
-
   findMoreThan10Likes(date: string): Promise<Board[]> {
     const stringToDate = new Date(date);
     const dateFormatter = (date) => date.toISOString().slice(0, 10);

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Patch,
   Post,
   Request,
@@ -17,6 +18,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { Role, UserProfile } from 'src/entity/user-profile.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
+import { WrittenBoardsDto } from './dto/written-board.dto';
 import { UserService } from './user.service';
 
 @ApiTags('유저 API')
@@ -87,5 +89,15 @@ export class UserController {
   @Post('/auth-login')
   login(@Request() req) {
     return req.user;
+  }
+
+  @ApiOperation({
+    summary: '유저가 작성한 게시글 목록 API',
+    description: '유저가 작성한 게시글 목록을 조회합니다.',
+  })
+  @Get('/written-boards/:id')
+  @UsePipes(ValidationPipe)
+  getBoards(@Param('id') userId: string): Promise<WrittenBoardsDto> {
+    return this.userService.getBoards(userId);
   }
 }

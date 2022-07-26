@@ -65,16 +65,6 @@ export class BoardController {
   }
 
   @ApiOperation({
-    summary: '유저가 작성한 게시글 목록 API',
-    description: '유저가 작성한 게시글 목록을 조회합니다.',
-  })
-  @Get('/written-boards/:id')
-  @UsePipes(ValidationPipe)
-  findByUserId(@Param('id') userId: string): Promise<BoardDto[]> {
-    return this.boardService.findByUserId(userId);
-  }
-
-  @ApiOperation({
     summary: '날짜별 HOT게시글 조회 API',
     description:
       '요청된 날짜에 작성된 게시글 중 추천을 10개이상 받은 게시글을 조회합니다.',

@@ -13,6 +13,7 @@ import { FollowersDto } from './dto/followers.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UserActivityBoardDto } from './dto/user-activity-board.dto';
 import { UserActivityDto } from './dto/user-activity.dto';
+import { WrittenBoardsDto } from './dto/written-board.dto';
 
 @Injectable()
 export class UserService {
@@ -86,5 +87,9 @@ export class UserService {
     user.chatRooms.push(chatRoom);
     user.save();
     return true;
+  }
+
+  getBoards(userId: string): Promise<WrittenBoardsDto> {
+    return this.userActivityRepository.getById(userId);
   }
 }
