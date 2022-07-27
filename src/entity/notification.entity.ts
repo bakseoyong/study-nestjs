@@ -42,12 +42,12 @@ export class Notification extends BaseEntity {
   @Column({ type: 'varchar', comment: 'alarm creator' })
   from: string;
 
+  @Column({ type: 'boolean', default: false, comment: 'is alarm read' })
+  read: boolean;
+
   @Column({ type: 'varchar', comment: 'alarm content' })
   content: string;
 
   @CreateDateColumn()
   created: Date;
-
-  @Column({ type: 'boolean', comment: 'checked true / false' })
-  checked: boolean;
 }

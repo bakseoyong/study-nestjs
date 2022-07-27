@@ -31,9 +31,8 @@ export class BoardService {
     @InjectRedis() private readonly redis: Redis,
   ) {}
 
-  async getById(boardId: number): Promise<BoardDto> {
-    const boardDto: BoardDto = await this.boardRepository.getById(boardId);
-    return boardDto;
+  async getById(boardId: number): Promise<Board> {
+    return await this.boardRepository.getById(boardId);
   }
 
   //getRelationById도 결국 getById에 viewcount더한건데 getById를
@@ -84,7 +83,7 @@ export class BoardService {
       notiType: NotificationType.FOLLWER_BOARD,
     };
 
-    await this.notificationService.createNoti(createNotiDto);
+    await this.notificationService.create(createNotiDto);
 
     return board;
   }

@@ -10,6 +10,7 @@ import { UserRepository } from 'src/repository/user.repository';
 import { ChatRoomsDto } from './dto/chat-rooms.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { FollowersDto } from './dto/followers.dto';
+import { NotificationsDto } from './dto/notificatinos-dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UserActivityBoardDto } from './dto/user-activity-board.dto';
 import { UserActivityDto } from './dto/user-activity.dto';
@@ -90,6 +91,10 @@ export class UserService {
   }
 
   getBoards(userId: string): Promise<WrittenBoardsDto> {
+    return this.userActivityRepository.getById(userId);
+  }
+
+  getNotifications(userId: string): Promise<NotificationsDto> {
     return this.userActivityRepository.getById(userId);
   }
 }
