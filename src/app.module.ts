@@ -1,4 +1,4 @@
-import { CacheModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeORMConfig } from './configs/typeorm.config';
 import { UserModule } from './user/user.module';
@@ -13,6 +13,7 @@ import { ChatModule } from './chat/chat.module';
 import { CommentModule } from './comment/comment.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { SseModule } from './sse/sse.module';
+import { ScrapModule } from './scrap/scrap.module';
 
 @Module({
   imports: [
@@ -32,8 +33,8 @@ import { SseModule } from './sse/sse.module';
     }),
     ChatModule,
     CommentModule,
+    ScrapModule,
   ],
-  controllers: [],
   providers: [EventsGateway],
 })
 export class AppModule {}

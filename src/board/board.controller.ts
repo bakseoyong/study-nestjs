@@ -16,7 +16,6 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardService } from './board.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { PaginationBoardDto } from './dto/pagination-boards.dto';
-import { ScrapBoardDto } from './dto/scrap-board.dto';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { User } from 'src/entity/user.entity';
 import { UpdateBoardDto } from './dto/update-board.dto';
@@ -103,23 +102,8 @@ export class BoardController {
   })
   @Get('/popular-boards')
   @UsePipes(ValidationPipe)
-  getPopularBoards(): Promise<Board[]> {
+  getPopularBoards(): Promise<BoardDto[]> {
     return this.boardService.getPopularBoards();
-  }
-
-  @ApiOperation({
-    summary: '게시글 스크랩 API',
-    description: '게시글을 스크랩합니다.',
-  })
-  @Get('/scrap-board/:id')
-  @UseGuards(JwtAuthGuard)
-  @UsePipes(ValidationPipe)
-  scrapBoard(@Param() param, @Req() req): Promise<boolean> {
-    const scrapBoardDto: ScrapBoardDto = {
-      boardId: param.id,
-      userId: req.user.id,
-    };
-    return this.boardService.scrapBoard(scrapBoardDto);
   }
 
   @ApiOperation({
@@ -128,13 +112,13 @@ export class BoardController {
   })
   @Post('/update/:id')
   @UseGuards(JwtAuthGuard)
-  updateBoard(
+  async updateBoard(
     @Req() req,
     @Body() updateBoardDto: UpdateBoardDto,
     @Param('id') boardId,
   ): Promise<boolean> {
-    this.boardService.checkAuthor(req.user.id, boardId);
-    return this.boardService.updateBoard(updateBoardDto, boardId);
+    await this.boardService.checkAuthor(req.user.id, boardId);
+    return this.boardService.update(updateBoardDto, boardId);
   }
 
   @ApiOperation({

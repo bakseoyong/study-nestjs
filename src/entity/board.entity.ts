@@ -6,7 +6,6 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { TimeInterval } from 'rxjs/internal/operators/timeInterval';
 import {
   BaseEntity,
   Column,
