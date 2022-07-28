@@ -12,12 +12,12 @@ import { HashtagService } from 'src/hashtag/hashtag.service';
 import { CreateNotiDto } from 'src/notification/dto/create-noti.dto';
 import { NotificationService } from 'src/notification/notification.service';
 import { BoardRepository } from 'src/repository/board.repository';
-import { UserActivityBoardDto } from 'src/user/dto/user-activity-board.dto';
 import { UserActivityDto } from 'src/user/dto/user-activity.dto';
+import { WrittenBoardsDto } from 'src/user/dto/written-board.dto';
 import { UserService } from 'src/user/user.service';
+import { MoreThanOrEqual } from 'typeorm';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { PaginationBoardDto, SortType } from './dto/pagination-boards.dto';
-import { ScrapBoardDto } from './dto/scrap-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 
 @Injectable()
@@ -31,7 +31,7 @@ export class BoardService {
     @InjectRedis() private readonly redis: Redis,
   ) {}
 
-  async getById(boardId: number): Promise<Board> {
+  async getById(boardId: number): Promise<BoardDto> {
     return await this.boardRepository.getById(boardId);
   }
 
@@ -89,20 +89,39 @@ export class BoardService {
   }
 
   async setAuthorUndefined(userId: string): Promise<boolean> {
-    const user: UserActivityBoardDto =
-      await this.userService.getActivityBoardById(userId);
-    return this.boardRepository.updateAuthorUndefined(user);
+    // const user: UserActivityBoardDto =
+    //   await this.userService.getActivityBoardById(userId);
+    const writtenBoardsDto: WrittenBoardsDto = await this.userService.getBoards(
+      userId,
+    );
+
+    writtenBoardsDto.boards.map((board) => {
+      board.user = null;
+      this.boardRepository.save(board);
+    });
+
+    return true;
   }
 
-  findMoreThan10Likes(date: string): Promise<Board[]> {
-    const stringToDate = new Date(date);
-    const dateFormatter = (date) => date.toISOString().slice(0, 10);
-    Logger.log(
-      `findMoreThan10Likes Service Layer : ${dateFormatter(stringToDate)}`,
-    );
-    return this.boardRepository.findMoreThan10Likes(
-      dateFormatter(stringToDate),
-    );
+  async findMoreThan10Likes(date: string): Promise<Board[]> {
+    const boards = this.redis.get('findMoreThan10Likes');
+    if (!boards) {
+      const stringToDate = new Date(date);
+      const dateFormatter = (date) => date.toISOString().slice(0, 10);
+      Logger.log(
+        `findMoreThan10Likes Service Layer : ${dateFormatter(stringToDate)}`,
+      );
+      const result = await this.boardRepository.find({
+        where: {
+          likes: MoreThanOrEqual(10),
+          created: dateFormatter(stringToDate),
+        },
+      });
+      this.redis.set('findMoreThan10Likes', JSON.stringify(result));
+      return result;
+    } else {
+      return JSON.parse(boards);
+    }
   }
 
   // findMoreThan5Reports(): Promise<Board[]> {
@@ -122,34 +141,31 @@ export class BoardService {
     }
   }
 
-  getPopularBoards(): Promise<Board[]> {
-    return this.boardRepository.getPopularBoards();
-  }
+  async getPopularBoards(): Promise<BoardDto[]> {
+    const date = new Date();
+    date.setHours(date.getHours() - 1);
 
-  async scrapBoard(scrapBoardDto: ScrapBoardDto): Promise<boolean> {
-    const { userId, boardId } = scrapBoardDto;
-
-    const scrap = new Scrap();
-    const boardDto = await this.getById(boardId);
-    const userActivityDto = await this.userService.getActivityById(userId);
-    scrap.board = Board.from(boardDto);
-    scrap.user = UserActivity.from(userActivityDto);
-    scrap.save();
-    return true;
+    return await this.boardRepository.find({
+      where: {
+        likes: MoreThanOrEqual(5),
+        created: MoreThanOrEqual(date),
+      },
+    });
   }
 
   async getAuthorById(boardId: number): Promise<string> {
     return (await this.boardRepository.getUserById(boardId)).id;
   }
 
-  async updateBoard(
+  async update(
     updateBoardDto: UpdateBoardDto,
     boardId: number,
   ): Promise<boolean> {
-    const board: BoardDto = await this.boardRepository.updateBoard(
-      updateBoardDto,
-      boardId,
-    );
+    const board = await this.boardRepository.getById(boardId);
+    const { title, content, ...other } = updateBoardDto;
+    board.title = title;
+    board.content = content;
+    this.boardRepository.save(board);
 
     const hashtags = await this.hashtagService.findOrCreateHashtags(
       updateBoardDto.postTagNames,
@@ -163,31 +179,6 @@ export class BoardService {
     this.redis.sadd(`likes:${boardId}`, userId);
     return this.redis.scard(`likes:${boardId}`);
   }
-
-  //중복이 되면 안되는데 지금은 중복되고 있음. => set으로 구현하고 likeCnt를 1 올리는게 아니라
-  // async likeBoard(userId: string, boardId: number): Promise<number> {
-  //   //this.redis.sadd('a', [1, 2, 3]);
-  //   //유실되면 안됨.
-  //   this.redis.multi();
-  //   let likeCnt: number = +(await this.redis.get(`likeCnt:${boardId}`));
-  //   let saved: Date = new Date(await this.redis.get(`likeSaved:${boardId}`));
-  //   if (!likeCnt) {
-  //     const board = await this.boardRepository.getById(boardId);
-  //     likeCnt = board.likeCount;
-  //     saved = new Date();
-  //     await this.redis.set(`likeSaved:${boardId}`, saved.toString());
-  //   }
-  //   if (new Date().getTime() - saved.getTime() >= 1000 * 60 * 10) {
-  //     const board = await this.boardRepository.getById(boardId);
-  //     board.likeCount = likeCnt;
-  //     board.save();
-  //     this.redis.del(`likeCount:${boardId}`);
-  //     this.redis.set(`likeSaved:${boardId}`, new Date().getTime());
-  //   }
-  //   await this.redis.set(`likeCount:${boardId}`, likeCnt + 1);
-  //   this.redis.exec();
-  //   return likeCnt + 1;
-  // }
 
   async viewBoard(boardId: number): Promise<number> {
     //어느정도 유실되어도 된다.

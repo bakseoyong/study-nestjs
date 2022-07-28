@@ -1,5 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { BoardService } from 'src/board/board.service';
+import { Board } from 'src/entity/board.entity';
 import { Comment } from 'src/entity/comment.entity';
 import { NotificationType } from 'src/entity/notification.entity';
 import { UserActivity } from 'src/entity/user-activity.entity';
@@ -25,14 +26,16 @@ export class CommentService {
     createCommentDto: CreateCommentDto,
     userId: string,
   ): Promise<boolean> {
-    const board = await this.boardService.getById(boardId);
+    const boardDto = await this.boardService.getById(boardId);
     const user: UserActivity = await this.userActivityRepository.getById(
       userId,
     );
     const { content } = createCommentDto;
 
     const comment = new Comment();
-    comment.board = board;
+    //getById를 다시 dto로 바꾸면서 생긴 문제
+    //일단 board로 바꾸고 manyToOne으로 브랜치 만들어서 수정하면 그때 해도 될것같다.
+    comment.board = Board.from(boardDto);
     comment.user = user;
     comment.content = content;
     this.commentRepository.save(comment);
