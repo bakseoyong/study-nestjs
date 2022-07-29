@@ -5,7 +5,6 @@ import { BoardDto } from 'src/entity/dto/board.dto';
 import { RelationBoardDto } from 'src/entity/dto/relation-board.dto';
 import { Hashtag } from 'src/entity/hashtag.entity';
 import { NotificationType } from 'src/entity/notification.entity';
-import { Scrap } from 'src/entity/scrap.entity';
 import { UserActivity } from 'src/entity/user-activity.entity';
 import { CreateBoardHashtagDto } from 'src/hashtag/dto/create-hashtag-board.dto';
 import { HashtagService } from 'src/hashtag/hashtag.service';

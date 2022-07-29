@@ -19,7 +19,8 @@ export class ScrapService {
   async create(createScrapDto: CreateScrapDto): Promise<boolean> {
     const { userId, boardId } = createScrapDto;
 
-    //일단 하고 typeorm 전용 브렌치 만들어서 해결해
+    //유튜브 보면서 하니까 집중이 하나도 안된다. typeorm에서 어떻게 여기 집어넣을수 있는지 찾아보자
+    //객체를 집어넣어야 되는데 그럴려면 리포지토리에서 직접 가져오는 방법말곤..
     const scrap = new Scrap();
     const boardDto = await this.boardService.getById(boardId);
     const userActivityDto = await this.userService.getActivityById(userId);
