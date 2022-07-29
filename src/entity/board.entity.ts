@@ -27,7 +27,7 @@ import { UserActivity } from './user-activity.entity';
 @Entity({ name: 'boards' })
 @Unique(['id'])
 export class Board extends BaseEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'board_id' })
   id: number;
 
   @IsOptional()
@@ -62,11 +62,6 @@ export class Board extends BaseEntity {
 
   @DeleteDateColumn({ name: 'deleted', comment: 'Deleted Date' })
   deleted: Date;
-
-  // '/board/my-scrap-board' JOIN
-  @OneToMany((type) => Scrap, (scrap) => scrap.board)
-  @ApiProperty({ type: () => Scrap })
-  scraps: Scrap[];
 
   @OneToMany((type) => BoardHashtag, (boardHashtag) => boardHashtag.board)
   @ApiProperty({ type: () => BoardHashtag })

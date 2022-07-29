@@ -3,6 +3,7 @@ import {
   BaseEntity,
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
@@ -16,16 +17,8 @@ export class Scrap extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'integer', comment: 'board Id' })
-  boardId: number;
-
-  // @Column({ type: 'varchar', comment: 'commenter' })
-  // userId: string;
-
-  // @ManyToOne((type) => Board, (board) => board.scrap)
-  // board: Board;
-
-  @ManyToOne((type) => Board, (board) => board.scraps)
+  @ManyToOne((type) => Board)
+  @JoinColumn({ name: 'board_id' })
   @ApiProperty({ type: Board })
   board: Board;
 
