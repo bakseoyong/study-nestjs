@@ -7,10 +7,18 @@ import { Board } from 'src/entity/board.entity';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
+import { User } from 'src/entity/user.entity';
 
 const mockRepository = () => ({
   getById: jest.fn(),
 });
+
+class MockRepository {
+  async getById(id) {
+    const user: User = new User();
+    return user;
+  }
+}
 
 const mockJwtService = () => ({
   sign: jest.fn(),
@@ -40,7 +48,10 @@ describe('게시글 서비스', () => {
       imports: [RedisModule],
       providers: [
         BoardService,
-        { provide: getRepositoryToken(Board), useValue: mockRepository() },
+        {
+          provide: getRepositoryToken(Board),
+          useValue: { getById: jest.fn() },
+        },
         { provide: JwtService, useValue: mockJwtService },
         { provide: UserService, useValue: mockUserService },
         { provide: HashtagService, useValue: mockHashtagService },
