@@ -14,6 +14,7 @@ import { NotificationsDto } from './dto/notificatinos-dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UserActivityBoardDto } from './dto/user-activity-board.dto';
 import { UserActivityDto } from './dto/user-activity.dto';
+import { UserProfileDto } from './dto/user-profile.dto';
 import { WrittenBoardsDto } from './dto/written-board.dto';
 
 @Injectable()
@@ -25,7 +26,7 @@ export class UserService {
     private readonly userActivityRepository: UserActivityRepository,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<UserProfile> {
+  async createUser(createUserDto: CreateUserDto): Promise<UserProfileDto> {
     const userProfile = await this.userProfileRepository.createUser(
       createUserDto,
     );
