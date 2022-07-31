@@ -19,7 +19,7 @@ import { WrittenBoardsDto } from './dto/written-board.dto';
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserRepository) // private userRepository: UserRepository,
+    //custom repository는 @InjectRepository 데코레이터를 사용하지 않는다.
     private readonly userRepository: UserRepository,
     private readonly userProfileRepository: UserProfileRepository,
     private readonly userActivityRepository: UserActivityRepository,
