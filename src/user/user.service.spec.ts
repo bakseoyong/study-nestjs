@@ -5,6 +5,10 @@ import { UserRepository } from 'src/repository/user.repository';
 import { UserActivityRepository } from 'src/repository/user-activity.repository';
 import { UserProfileRepository } from 'src/repository/user-profile.repository';
 import { Department, Role } from 'src/entity/user-profile.entity';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
+import { NotFoundException } from '@nestjs/common';
+import * as _ from 'lodash';
+import { User } from 'src/entity/user.entity';
 
 //keyof는 존재하는 모든 키 값을 가져온다.
 //Repository를 집어 넣으면 리포지토리의 키들을 가져온다. 키들의 값은 jest.Mock
@@ -16,9 +20,9 @@ const mockRepository = () => ({
   getById: jest.fn(),
   createUser: jest.fn(),
   deleteUser: jest.fn(),
-  updateUserProfile: jest.fn(),
   readAllUser: jest.fn(),
   findByLogin: jest.fn(),
+  findOne: jest.fn(),
 });
 
 describe('유저 서비스', () => {
@@ -68,9 +72,10 @@ describe('유저 서비스', () => {
     userRepository.deleteUser.mockResolvedValue(1);
     userRepository.save.mockResolvedValue(1);
     userProfileRepository.createUser.mockResolvedValue(1);
-    userProfileRepository.updateUserProfile.mockResolvedValue(1);
+    userProfileRepository.save.mockResolvedValue(1);
     userProfileRepository.readAllUser.mockResolvedValue(1);
     userProfileRepository.findByLogin.mockResolvedValue(1);
+    userProfileRepository.findOne.mockResolvedValue(undefined);
     userActivityRepository.getById.mockResolvedValue(1);
     userActivityRepository.save.mockResolvedValue(1);
   });
@@ -92,14 +97,47 @@ describe('유저 서비스', () => {
         phone: '010-0101-0101',
       });
     });
+  });
 
-    it('실패 : 비밀번호 형식에 맞지 않음', async () => {
-      await service.createUser({
-        uid: 'userTest1',
+  describe('유저 업데이트', () => {
+    // it('성공 : 유저 업데이트 성공', async () => {
+    //   jest.spyOn(userProfileRepository, 'save').mockResolvedValue(new User());
+
+    //   const updateUserProfileDto: UpdateUserProfileDto = {
+    //     id: '1',
+    //     email: 'userTestEmail@email.com',
+    //     password: 'usetTestPassword!',
+    //     phone: '010-0101-0101',
+    //   };
+
+    //   // const result = async () => {
+    //   //   await service.updateUserProfile(updateUserProfileDto);
+    //   // };
+
+    //   //await expect(result).resolves.toMatchObject(User);
+    //   // await expect(result).toMatchObject(User);
+    //   expect(service.updateUserProfile(updateUserProfileDto)).toMatchObject(
+    //     User,
+    //   );
+    // });
+
+    it('실패 : 유저 업데이트 실패', async () => {
+      jest.spyOn(userProfileRepository, 'save').mockResolvedValue(undefined);
+
+      const updateUserProfileDto: UpdateUserProfileDto = {
+        id: '1',
         email: 'userTestEmail@email.com',
-        password: '1',
+        password: 'usetTestPassword!',
         phone: '010-0101-0101',
-      });
+      };
+
+      const result = async () => {
+        await service.updateUserProfile(updateUserProfileDto);
+      };
+
+      await expect(result).rejects.toThrowError(
+        new NotFoundException('유저 정보를 찾을 수 없습니다.'),
+      );
     });
   });
 });
