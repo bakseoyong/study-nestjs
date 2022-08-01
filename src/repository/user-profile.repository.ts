@@ -37,34 +37,6 @@ export class UserProfileRepository extends Repository<UserProfile> {
     }
   }
 
-  async updateUserProfile(
-    updateUserProfileDto: UpdateUserProfileDto,
-  ): Promise<boolean> {
-    try {
-      const { uid, email, phone } = updateUserProfileDto;
-      const password = await bcrypt.hash(updateUserProfileDto.password, 10);
-
-      const userProfile = await this.update(
-        { uid },
-        {
-          password,
-          email,
-          phone,
-        },
-      );
-
-      return userProfile ? true : false;
-    } catch (error) {
-      throw new HttpException(
-        {
-          message: 'SQL Error',
-          error: error.sqlMessage,
-        },
-        HttpStatus.FORBIDDEN,
-      );
-    }
-  }
-
   async readAllUser(): Promise<UserProfile[]> {
     return await this.find();
   }

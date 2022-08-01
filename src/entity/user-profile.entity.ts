@@ -28,6 +28,15 @@ export enum Role {
   MEMBER = 'MEMEBER',
 }
 
+export enum Department {
+  컴퓨터공학과 = <any>'cse',
+  정보통신공학과 = <any>'ice',
+}
+
+const strToEnumDept = {
+  cse: Department.컴퓨터공학과,
+};
+
 @Entity({ name: 'user_profiles' })
 @Unique(['user'])
 export class UserProfile extends BaseEntity {
@@ -116,6 +125,17 @@ export class UserProfile extends BaseEntity {
     message: 'Enter a phone that not follow the format',
   })
   phone: string;
+
+  @ApiProperty({
+    example: '컴퓨터공학과',
+    description: '학과',
+  })
+  @IsOptional()
+  @Column({
+    type: 'enum',
+    enum: Department,
+  })
+  department: Department;
 
   @CreateDateColumn({ name: 'created', comment: 'Created Date' })
   created: Date;

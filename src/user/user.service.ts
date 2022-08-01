@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import _ from 'lodash';
 import { Room } from 'src/entity/room.entity';
 import { UserActivity } from 'src/entity/user-activity.entity';
 import { UserProfile } from 'src/entity/user-profile.entity';
@@ -14,18 +14,20 @@ import { NotificationsDto } from './dto/notificatinos-dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UserActivityBoardDto } from './dto/user-activity-board.dto';
 import { UserActivityDto } from './dto/user-activity.dto';
+import { UserProfileDto } from './dto/user-profile.dto';
 import { WrittenBoardsDto } from './dto/written-board.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserRepository) // private userRepository: UserRepository,
+    //custom repository는 @InjectRepository 데코레이터를 사용하지 않는다.
     private readonly userRepository: UserRepository,
     private readonly userProfileRepository: UserProfileRepository,
     private readonly userActivityRepository: UserActivityRepository,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<UserProfile> {
+  async createUser(createUserDto: CreateUserDto): Promise<UserProfileDto> {
     const userProfile = await this.userProfileRepository.createUser(
       createUserDto,
     );
@@ -42,10 +44,26 @@ export class UserService {
     return userProfile;
   }
 
-  updateUserProfile(
+  async updateUserProfile(
     updateUserProfileDto: UpdateUserProfileDto,
-  ): Promise<boolean> {
-    return this.userProfileRepository.updateUserProfile(updateUserProfileDto);
+  ): Promise<UserProfileDto> {
+    const { id, password, email, phone } = updateUserProfileDto;
+
+    const user = await this.userProfileRepository.findOne(id);
+
+    if (!user) {
+      throw new NotFoundException('유저 정보를 찾을 수 없습니다.');
+    }
+
+    // if (_.isEmpty(user) === true) {
+    //   throw new NotFoundException('유저 정보를 찾을 수 없습니다.');
+    // }
+
+    user.password = await bcrypt.hash(password, 10);
+    user.email = email;
+    user.phone = phone;
+
+    return this.userActivityRepository.save(user);
   }
 
   async deleteUser(id: string): Promise<boolean> {

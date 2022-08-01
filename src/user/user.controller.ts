@@ -18,6 +18,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { Role, UserProfile } from 'src/entity/user-profile.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
+import { UserProfileDto } from './dto/user-profile.dto';
 import { WrittenBoardsDto } from './dto/written-board.dto';
 import { UserService } from './user.service';
 
@@ -32,7 +33,7 @@ export class UserController {
   })
   @Post('/create-user')
   @UsePipes(ValidationPipe)
-  createUser(@Body() createUserDto: CreateUserDto): Promise<UserProfile> {
+  createUser(@Body() createUserDto: CreateUserDto): Promise<UserProfileDto> {
     return this.userService.createUser(createUserDto);
   }
 
@@ -44,7 +45,7 @@ export class UserController {
   @UsePipes(ValidationPipe)
   updateUser(
     @Body() updateUserProfileDto: UpdateUserProfileDto,
-  ): Promise<boolean> {
+  ): Promise<UserProfileDto> {
     return this.userService.updateUserProfile(updateUserProfileDto);
   }
 

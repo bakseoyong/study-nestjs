@@ -6,6 +6,7 @@ import { RelationBoardDto } from 'src/entity/dto/relation-board.dto';
 import { Hashtag } from 'src/entity/hashtag.entity';
 import { NotificationType } from 'src/entity/notification.entity';
 import { UserActivity } from 'src/entity/user-activity.entity';
+import { Department } from 'src/entity/user-profile.entity';
 import { CreateBoardHashtagDto } from 'src/hashtag/dto/create-hashtag-board.dto';
 import { HashtagService } from 'src/hashtag/hashtag.service';
 import { CreateNotiDto } from 'src/notification/dto/create-noti.dto';
@@ -35,12 +36,23 @@ export class BoardService {
   }
 
   //getRelationById도 결국 getById에 viewcount더한건데 getById를
-  //이렇게 만들어야하는거 아닐까
-  async getRelationById(boardId: number): Promise<RelationBoardDto> {
-    const viewCount = await this.viewBoard(boardId);
+  //여기서 발전해서 학과 인원들만 들어갈 수 있는 학과 전용 게시판 만들어도 괜찮겠다.
+  //일단 board말고 없는 것 같고, null이 가능한 컬럼으로 설정하고
+  //우선 redis에서 적합한 자료구조를 찾아보자
+  //getRelationById를 글을 렌더링 할 때만 조회하는게 아니므로 viewboard도 user정보가 필요했다.
+  async getRelationById(
+    boardId: number,
+    user?: any,
+  ): Promise<RelationBoardDto> {
     const relationBoardDto: RelationBoardDto =
       await this.boardRepository.getById(boardId);
-    relationBoardDto.viewCount = viewCount;
+
+    if (user) {
+      //유저 정보가 필요하지 않지만 getRelationById를 호출하는 목적에 따라 구분하기 위함
+      const viewCount = await this.viewBoard(boardId);
+      const hotDept = await this.getHotDept(boardId, user.dept);
+      relationBoardDto.viewCount = viewCount;
+    }
 
     return relationBoardDto;
   }
@@ -213,5 +225,30 @@ export class BoardService {
     } else {
       throw new BadRequestException();
     }
+  }
+
+  async getHotDept(boardId: number, dept: Department): Promise<string> {
+    let deptStr: string = this.redis.get(`deptStr:${boardId}`);
+    if (!deptStr) {
+      this.redis.set(`deptStr:${boardId}`, `${dept} `);
+      return null;
+    }
+    const deptArr: string[] = deptStr.split(' ');
+    const counts = deptArr.reduce((pv, cv) => {
+      pv[cv] = (pv[cv] || 0) + 1;
+      return pv;
+    }, {});
+    const keys = Object.keys(counts);
+    let mode = keys[0];
+    keys.forEach((val, idx) => {
+      if (counts[val] > counts[mode]) {
+        mode = val;
+      }
+    });
+
+    deptStr = deptStr + `${dept} `;
+    this.redis.set(`deptStr:${boardId}`, deptStr);
+
+    return Object.keys(Department)[Object.values(Department).indexOf(mode)];
   }
 }
