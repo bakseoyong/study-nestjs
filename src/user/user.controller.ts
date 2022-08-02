@@ -46,7 +46,7 @@ export class UserController {
   updateUser(
     @Body() updateUserProfileDto: UpdateUserProfileDto,
   ): Promise<UserProfileDto> {
-    return this.userService.updateUserProfile(updateUserProfileDto);
+    return this.userService.update(updateUserProfileDto);
   }
 
   @ApiOperation({

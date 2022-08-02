@@ -67,4 +67,30 @@ export class UserActivity extends BaseEntity {
     userActivityDto.id = userActivity.id;
     return userActivityDto;
   }
+
+  create(userId: string): User {
+    const user = new User();
+    user.id = userId;
+    return user;
+  }
+
+  addChatRoom(room: Room) {
+    this.chatRooms.push(room);
+  }
+
+  getFollowers(): Follow[] {
+    return this.followers;
+  }
+
+  getChatRooms(): Room[] {
+    return this.chatRooms;
+  }
+
+  getBoards(): Board[] {
+    return this.boards;
+  }
+
+  getNotifications(): Notification[] {
+    return this.notifications;
+  }
 }

@@ -5,38 +5,12 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateUserDto } from 'src/user/dto/createUser.dto';
-import { UpdateUserProfileDto } from 'src/user/dto/update-user-profile.dto';
 import { EntityRepository, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserProfile } from 'src/entity/user-profile.entity';
 
 @EntityRepository(UserProfile) //@EntityRepository deprecated in typeorm@^0.3.6
 export class UserProfileRepository extends Repository<UserProfile> {
-  async createUser(createUserDto: CreateUserDto): Promise<UserProfile> {
-    try {
-      const { uid, email, phone } = createUserDto;
-      const password = await bcrypt.hash(createUserDto.password, 10);
-
-      const userProfile = await this.save({
-        uid,
-        password,
-        email,
-        phone,
-      });
-
-      return userProfile;
-    } catch (error) {
-      throw new HttpException(
-        {
-          message: 'SQL Error',
-          error: error.sqlMessage,
-        },
-        HttpStatus.FORBIDDEN,
-      );
-    }
-  }
-
   async readAllUser(): Promise<UserProfile[]> {
     return await this.find();
   }

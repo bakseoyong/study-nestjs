@@ -5,10 +5,12 @@ import { SendChatDto } from './dto/send-chat.dto';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { ChatListDto } from './dto/chat-list.dto';
 import { Room } from 'src/entity/room.entity';
+import { UserActivityRepository } from 'src/repository/user-activity.repository';
 
 @Injectable()
 export class ChatService {
   constructor(
+    private readonly userActivityRepository: UserActivityRepository,
     private readonly userService: UserService,
     @InjectRedis() private readonly redis: Redis,
   ) {}
@@ -51,9 +53,9 @@ export class ChatService {
   }
 
   async showChatList(userId: string): Promise<ChatListDto[]> {
-    const rooms: Room[] = await (
-      await this.userService.getChatRooms(userId)
-    ).chatRooms;
+    const user = await this.userActivityRepository.findOne(userId);
+
+    const rooms: Room[] = user.getChatRooms();
 
     const chatList: ChatListDto[] = [];
     for (const room of rooms) {
@@ -73,9 +75,9 @@ export class ChatService {
   }
 
   async deleteChat(userId: string, chatId: number): Promise<boolean> {
-    const rooms: Room[] = await (
-      await this.userService.getChatRooms(userId)
-    ).chatRooms;
+    const user = await this.userActivityRepository.findOne(userId);
+
+    const rooms: Room[] = user.getChatRooms();
 
     const index = rooms.findIndex((element) => element.id === chatId);
     rooms.splice(index, 1);

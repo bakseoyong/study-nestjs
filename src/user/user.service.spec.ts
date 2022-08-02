@@ -8,7 +8,6 @@ import { Department, Role } from 'src/entity/user-profile.entity';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { NotFoundException } from '@nestjs/common';
 import * as _ from 'lodash';
-import { User } from 'src/entity/user.entity';
 
 //keyof는 존재하는 모든 키 값을 가져온다.
 //Repository를 집어 넣으면 리포지토리의 키들을 가져온다. 키들의 값은 jest.Mock
@@ -18,7 +17,6 @@ type MockRepository<T = any> = Partial<Record<keyof T, jest.Mock>>;
 const mockRepository = () => ({
   save: jest.fn(),
   getById: jest.fn(),
-  createUser: jest.fn(),
   deleteUser: jest.fn(),
   readAllUser: jest.fn(),
   findByLogin: jest.fn(),
@@ -71,7 +69,6 @@ describe('유저 서비스', () => {
     });
     userRepository.deleteUser.mockResolvedValue(1);
     userRepository.save.mockResolvedValue(1);
-    userProfileRepository.createUser.mockResolvedValue(1);
     userProfileRepository.save.mockResolvedValue(1);
     userProfileRepository.readAllUser.mockResolvedValue(1);
     userProfileRepository.findByLogin.mockResolvedValue(1);

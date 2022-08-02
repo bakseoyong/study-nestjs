@@ -27,7 +27,7 @@ export class CommentService {
     userId: string,
   ): Promise<boolean> {
     const boardDto = await this.boardService.getById(boardId);
-    const user: UserActivity = await this.userActivityRepository.getById(
+    const user: UserActivity = await this.userActivityRepository.findOne(
       userId,
     );
     const { content } = createCommentDto;

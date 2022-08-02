@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Notification, NotificationType } from 'src/entity/notification.entity';
 import { UserActivity } from 'src/entity/user-activity.entity';
 import { NotificationRepository } from 'src/repository/notification.repository';
-import { NotificationsDto } from 'src/user/dto/notificatinos-dto';
+import { UserActivityRepository } from 'src/repository/user-activity.repository';
 import { UserService } from 'src/user/user.service';
 import { CreateNotiDto } from './dto/create-noti.dto';
 
@@ -10,6 +10,7 @@ import { CreateNotiDto } from './dto/create-noti.dto';
 export class NotificationService {
   constructor(
     private readonly notificationRepository: NotificationRepository,
+    private readonly userActivityRepository: UserActivityRepository,
 
     private readonly userService: UserService,
   ) {}
@@ -57,8 +58,9 @@ export class NotificationService {
   }
 
   async readAll(userId: string): Promise<boolean> {
-    const notificationsDto = await this.userService.getNotifications(userId);
-    notificationsDto.notifications.map((notification) => {
+    const user = await this.userActivityRepository.findOne(userId);
+
+    user.getNotifications().map((notification) => {
       notification.read = true;
       this.notificationRepository.save(notification);
     });
@@ -77,8 +79,9 @@ export class NotificationService {
       }
     }
 
-    const notificationsDto = await this.userService.getNotifications(userId);
-    const reads = notificationsDto.notifications.filter(isRead);
+    const user = await this.userActivityRepository.findOne(userId);
+
+    const reads = user.getNotifications().filter(isRead);
     this.notificationRepository.remove(reads);
     return true;
   }

@@ -7,16 +7,12 @@ import { User } from 'src/entity/user.entity';
 import { UserActivityRepository } from 'src/repository/user-activity.repository';
 import { UserProfileRepository } from 'src/repository/user-profile.repository';
 import { UserRepository } from 'src/repository/user.repository';
-import { ChatRoomsDto } from './dto/chat-rooms.dto';
 import { CreateUserDto } from './dto/createUser.dto';
-import { FollowersDto } from './dto/followers.dto';
-import { NotificationsDto } from './dto/notificatinos-dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UserActivityBoardDto } from './dto/user-activity-board.dto';
 import { UserActivityDto } from './dto/user-activity.dto';
 import { UserProfileDto } from './dto/user-profile.dto';
 import { WrittenBoardsDto } from './dto/written-board.dto';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -28,26 +24,25 @@ export class UserService {
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<UserProfileDto> {
-    const userProfile = await this.userProfileRepository.createUser(
-      createUserDto,
-    );
+    const userProfile = new UserProfile();
+    userProfile.create(createUserDto);
+    await this.userProfileRepository.save(userProfile);
 
     const user = new User();
-    user.id = userProfile.id;
+    user.create(userProfile.getId());
+    await this.userRepository.save(user);
 
     const userActivity = new UserActivity();
-    userActivity.id = userProfile.id;
-
-    await this.userRepository.save(user);
+    userActivity.create(userProfile.getId());
     await this.userActivityRepository.save(userActivity);
 
     return userProfile;
   }
 
-  async updateUserProfile(
+  async update(
     updateUserProfileDto: UpdateUserProfileDto,
   ): Promise<UserProfileDto> {
-    const { id, password, email, phone } = updateUserProfileDto;
+    const { id } = updateUserProfileDto;
 
     const user = await this.userProfileRepository.findOne(id);
 
@@ -59,11 +54,8 @@ export class UserService {
     //   throw new NotFoundException('유저 정보를 찾을 수 없습니다.');
     // }
 
-    user.password = await bcrypt.hash(password, 10);
-    user.email = email;
-    user.phone = phone;
-
-    return this.userActivityRepository.save(user);
+    user.update(updateUserProfileDto);
+    return this.userProfileRepository.save(user);
   }
 
   async deleteUser(id: string): Promise<boolean> {
@@ -74,24 +66,12 @@ export class UserService {
     return this.userProfileRepository.readAllUser();
   }
 
-  getById(userId: string): Promise<User> {
-    return this.userRepository.getById(userId);
-  }
-
   getActivityById(userId: string): Promise<UserActivityDto> {
-    return this.userActivityRepository.getById(userId);
+    return this.userActivityRepository.findOne(userId);
   }
 
   getActivityBoardById(userId: string): Promise<UserActivityBoardDto> {
-    return this.userActivityRepository.getById(userId);
-  }
-
-  getFollowers(userId: string): Promise<FollowersDto> {
-    return this.userActivityRepository.getById(userId);
-  }
-
-  getChatRooms(userId: string): Promise<ChatRoomsDto> {
-    return this.userActivityRepository.getById(userId);
+    return this.userActivityRepository.findOne(userId);
   }
 
   async addChatRooms(
@@ -99,20 +79,22 @@ export class UserService {
     partner: string,
     roomId: number,
   ): Promise<boolean> {
-    const user: UserActivity = await this.userActivityRepository.getById(
+    const user: UserActivity = await this.userActivityRepository.findOne(
       userId,
     );
     const chatRoom = Room.from(roomId, partner);
-    user.chatRooms.push(chatRoom);
-    user.save();
+    user.addChatRoom(chatRoom);
+    this.userActivityRepository.save(user);
     return true;
   }
 
-  getBoards(userId: string): Promise<WrittenBoardsDto> {
-    return this.userActivityRepository.getById(userId);
-  }
+  async getBoards(userId: string): Promise<WrittenBoardsDto> {
+    const user: UserActivity = await this.userActivityRepository.findOne(
+      userId,
+    );
 
-  getNotifications(userId: string): Promise<NotificationsDto> {
-    return this.userActivityRepository.getById(userId);
+    const writtenBoardsDto = new WrittenBoardsDto();
+    writtenBoardsDto.boards = user.getBoards();
+    return writtenBoardsDto;
   }
 }

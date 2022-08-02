@@ -12,8 +12,8 @@ import { HashtagService } from 'src/hashtag/hashtag.service';
 import { CreateNotiDto } from 'src/notification/dto/create-noti.dto';
 import { NotificationService } from 'src/notification/notification.service';
 import { BoardRepository } from 'src/repository/board.repository';
+import { UserActivityRepository } from 'src/repository/user-activity.repository';
 import { UserActivityDto } from 'src/user/dto/user-activity.dto';
-import { WrittenBoardsDto } from 'src/user/dto/written-board.dto';
 import { UserService } from 'src/user/user.service';
 import { MoreThanOrEqual } from 'typeorm';
 import { CreateBoardDto } from './dto/create-board.dto';
@@ -24,6 +24,7 @@ import { UpdateBoardDto } from './dto/update-board.dto';
 export class BoardService {
   constructor(
     private readonly boardRepository: BoardRepository,
+    private readonly userActivityRepository: UserActivityRepository,
 
     private readonly userService: UserService,
     private readonly hashtagService: HashtagService,
@@ -65,9 +66,7 @@ export class BoardService {
       createBoardDto.tagNames,
     );
 
-    const user: UserActivity = UserActivity.from(
-      await this.userService.getActivityById(userId),
-    );
+    const user = await this.userActivityRepository.findOne(userId);
 
     const { title, content, ...other } = createBoardDto;
 
@@ -81,11 +80,7 @@ export class BoardService {
 
     await this.hashtagService.createBoardHashtags(createBoardHashtagDto);
 
-    const followDtos = await this.userService.getFollowers(userId);
-    if (!followDtos.followers) {
-      return board;
-    }
-    const receivers = followDtos.followers.map((follow) => follow.from);
+    const receivers = user.getFollowers().map((follow) => follow.from);
 
     const createNotiDto: CreateNotiDto = {
       to: receivers,
@@ -100,13 +95,9 @@ export class BoardService {
   }
 
   async setAuthorUndefined(userId: string): Promise<boolean> {
-    // const user: UserActivityBoardDto =
-    //   await this.userService.getActivityBoardById(userId);
-    const writtenBoardsDto: WrittenBoardsDto = await this.userService.getBoards(
-      userId,
-    );
+    const user = await this.userActivityRepository.findOne(userId);
 
-    writtenBoardsDto.boards.map((board) => {
+    user.getBoards().map((board) => {
       board.user = null;
       this.boardRepository.save(board);
     });

@@ -7,6 +7,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { CreateUserDto } from 'src/user/dto/createUser.dto';
 import {
   BaseEntity,
   Column,
@@ -20,6 +21,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
+import * as bcrypt from 'bcrypt';
+import { UpdateUserProfileDto } from 'src/user/dto/update-user-profile.dto';
 
 export enum Role {
   ADMIN = 'ADMIN',
@@ -145,4 +148,29 @@ export class UserProfile extends BaseEntity {
 
   @DeleteDateColumn({ name: 'deleted', comment: 'Deleted Date' })
   deleted: Date;
+
+  public async create(createUserDto: CreateUserDto): Promise<UserProfile> {
+    const { uid, email, phone } = createUserDto;
+    const password = await bcrypt.hash(createUserDto.password, 10);
+
+    const userProfile = new UserProfile();
+    userProfile.uid = uid;
+    userProfile.password = password;
+    userProfile.email = email;
+    userProfile.phone = phone;
+    return userProfile;
+  }
+
+  public async update(
+    updateUserProfileDto: UpdateUserProfileDto,
+  ): Promise<void> {
+    const { email, phone } = updateUserProfileDto;
+    this.password = await bcrypt.hash(updateUserProfileDto.password, 10);
+    this.email = email;
+    this.phone = phone;
+  }
+
+  public getId(): string {
+    return this.id;
+  }
 }

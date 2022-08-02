@@ -13,4 +13,10 @@ export class User extends BaseEntity {
 
   @OneToOne(() => UserActivity, (userActivity) => userActivity.user)
   userActivity: UserActivity;
+
+  create(userId: string): User {
+    const user = new User();
+    user.id = userId;
+    return user;
+  }
 }
