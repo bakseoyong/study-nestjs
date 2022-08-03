@@ -14,6 +14,7 @@ import { CommentModule } from './comment/comment.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { SseModule } from './sse/sse.module';
 import { ScrapModule } from './scrap/scrap.module';
+import { AdModule } from './ad/ad.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ScrapModule } from './scrap/scrap.module';
     ChatModule,
     CommentModule,
     ScrapModule,
+    AdModule,
   ],
   providers: [EventsGateway],
 })

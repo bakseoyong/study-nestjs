@@ -35,4 +35,12 @@ export class ScrapService {
       return false;
     }
   }
+
+  deleteByBoard(boardId: number) {
+    const board = this.boardRepository.findOne(boardId);
+    //단방향 연관관계인 경우 하나의 게시글이 삭제될때마다 삭제된 게시글 id를 가지고
+    //scraps를 탐색해야 한다.
+
+    //양방향 연관관계인 경우 게시글에서 스크랩된 엔티티들을 얻어 삭제시킬 수 있다.
+  }
 }
