@@ -8,6 +8,7 @@ import { CreateScrapDto } from './dto/create-scrap.dto';
 @Injectable()
 export class ScrapService {
   constructor(
+    //test
     private readonly scrapRepository: ScrapRepository,
     private readonly boardRepository: BoardRepository,
     private readonly userActivityRepository: UserActivityRepository,
