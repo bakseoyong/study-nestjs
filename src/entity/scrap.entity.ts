@@ -1,3 +1,4 @@
+import { HttpException } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   BaseEntity,
@@ -16,11 +17,18 @@ export class Scrap extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ApiProperty({ type: Board })
   @ManyToOne((type) => Board)
   @JoinColumn({ name: 'board_id' })
-  @ApiProperty({ type: Board })
   board: Board;
 
   @ManyToOne((type) => UserActivity, (userActivity) => userActivity.scraps)
   user: UserActivity;
+
+  create(userActivity: UserActivity, board: Board): Scrap {
+    const scrap = new Scrap();
+    scrap.board = board;
+    scrap.user = userActivity;
+    return scrap;
+  }
 }

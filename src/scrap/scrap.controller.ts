@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   Param,
   Req,
@@ -29,5 +30,16 @@ export class ScrapController {
       userId: req.user.id,
     };
     return this.scrapService.create(createScrapDto);
+  }
+
+  @ApiOperation({
+    summary: '게시글 스크랩 해제 API',
+    description: '게시글 스크랩을 해제합니다.',
+  })
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(ValidationPipe)
+  delete(@Param('id') boardId, @Req() req): Promise<boolean> {
+    return this.scrapService.delete(boardId, req.user.id);
   }
 }

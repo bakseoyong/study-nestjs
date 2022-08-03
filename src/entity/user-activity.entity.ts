@@ -93,4 +93,18 @@ export class UserActivity extends BaseEntity {
   getNotifications(): Notification[] {
     return this.notifications;
   }
+
+  getScraps(): Scrap[] {
+    return this.scraps;
+  }
+
+  getScrapOne(board: Board): Scrap {
+    const scraps = this.getScraps();
+    scraps.map((scrap) => {
+      if (scrap.board === board) {
+        return scrap;
+      }
+    });
+    throw new Error('스크랩이 존재하지 않습니다.');
+  }
 }
