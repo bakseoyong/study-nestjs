@@ -26,34 +26,41 @@ export class UserActivity extends BaseEntity {
 
   @ApiProperty({})
   @OneToOne(() => User, (user) => user.userProfile, { cascade: true })
-  @JoinColumn()
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @ApiProperty({})
   @OneToMany((type) => Follow, (follow) => follow.to)
+  @JoinColumn({ name: 'follow_id' })
   followings: Follow[];
 
   @ApiProperty({})
   @OneToMany((type) => Follow, (follow) => follow.from)
+  @JoinColumn({ name: 'follow_id' })
   followers: Follow[];
 
   @ApiProperty({})
   @ManyToOne((type) => Scrap, (scrap) => scrap.user)
+  @JoinColumn({ name: 'scrap_id' })
   scraps: Scrap[];
 
   @ApiProperty({})
   @OneToMany((type) => Comment, (comment) => comment.user)
+  @JoinColumn({ name: 'comment_id' })
   comments: Comment[];
 
   @ApiProperty({})
   @OneToMany((type) => Notification, (notification) => notification.to)
+  @JoinColumn({ name: 'notification_id' })
   notifications: Notification[];
 
   @ApiProperty({})
   @OneToMany((type) => Board, (board) => board.user)
+  @JoinColumn({ name: 'board_id' })
   boards: Board[];
 
   @ApiProperty({})
+  @JoinColumn({ name: 'room_id' })
   chatRooms: Room[];
 
   static from(userActivityDto: UserActivityDto): UserActivity {
