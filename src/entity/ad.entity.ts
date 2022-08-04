@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional } from 'class-validator';
 import { create } from 'lodash';
+import { type } from 'os';
 import { CreateAdDto } from 'src/ad/dto/create-ad.dto';
 import {
   BaseEntity,
@@ -9,6 +11,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
+  UpdateDateColumn,
 } from 'typeorm';
 import { AdManager } from './adManager.entity';
 import { Advertiser } from './advertiser.entity';
@@ -32,7 +35,7 @@ export enum AdType {
 
 @Entity({ name: 'ad' })
 @Unique(['id'])
-export class Ad extends BaseEntity {
+export class Ad {
   @PrimaryGeneratedColumn()
   id: number;
 

@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  BaseEntity,
   Column,
   Entity,
   OneToMany,
@@ -20,9 +19,10 @@ export enum AdvertiserStatus {
   제한 = 4,
 }
 
-@Entity({ name: 'ad' })
+@Entity({ name: 'advertiser' })
 @Unique(['id'])
-export class Advertiser extends BaseEntity {
+//BaseEntity는 Active Record를 사용하기 위해 상속됨
+export class Advertiser {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -48,24 +48,24 @@ export class Advertiser extends BaseEntity {
   @OneToMany((type) => Ad, (ad) => ad.advertiser)
   ads: Ad[];
 
-  @Column('integer')
+  @Column('integer', { default: 0 })
   charge: number;
 
   //컨셉 : AdManager는 담당자 지정 알고리즘을 통해 파라미터로 전달
+  //오류 해결 : 리턴값으로 프로미스 형식을 둘러싼 Advertiser객체를 리턴하려고 하니 this객체에 적용이 안됐었음.
   async create(
     createAdvertiserDto: CreateAdvertiserDto,
     adManager: AdManager,
   ): Promise<Advertiser> {
-    const advertiser = new Advertiser();
     const { uid, name, email } = createAdvertiserDto;
     const password = await bcrypt.hash(createAdvertiserDto.password, 10);
-    advertiser.uid = uid;
-    advertiser.name = name;
-    advertiser.email = email;
-    advertiser.password = password;
+    this.uid = uid;
+    this.name = name;
+    this.email = email;
+    this.password = password;
 
-    adManager.approveAccount(advertiser);
-    return advertiser;
+    adManager.approveAccount(this);
+    return this;
   }
 
   //다른객체의 상태를 변경할때 (매니저가 광고주의 상태를 변경) 하는게 유의해야 하는 것이 있는지 검색 해보기
