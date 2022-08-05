@@ -12,9 +12,18 @@ export class AdController {
     description: '광고주 계정 회원가입.',
   })
   @Post('/create-advertiser')
-  getRelationById(
+  createAdvertiser(
     @Body() createAdvertiserDto: CreateAdvertiserDto,
   ): Promise<CreateAdvertiserDto> {
     return this.adService.createAdvertiser(createAdvertiserDto);
+  }
+
+  @ApiOperation({
+    summary: '광고 게시 API',
+    description: '광고주가 광고를 게시하고 담당자가 심사합니다.',
+  })
+  @Get('/post-ad')
+  createAd(@Body() createAdDto: CreateAdDto): Promise<CreateAdDto> {
+    return this.adService.createAdvertiser(createAdDto);
   }
 }
