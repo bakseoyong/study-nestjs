@@ -1,8 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import _ from 'lodash';
 import { Room } from 'src/entity/room.entity';
 import { UserActivity } from 'src/entity/user-activity.entity';
-import { UserProfile } from 'src/entity/user-profile.entity';
+import { Role, UserProfile } from 'src/entity/user-profile.entity';
 import { User } from 'src/entity/user.entity';
 import { UserActivityRepository } from 'src/repository/user-activity.repository';
 import { UserProfileRepository } from 'src/repository/user-profile.repository';
@@ -41,8 +45,11 @@ export class UserService {
 
   async update(
     updateUserProfileDto: UpdateUserProfileDto,
+    jwtPayload: { id: string; role: Role },
   ): Promise<UserProfileDto> {
     const { id } = updateUserProfileDto;
+
+    this.checkUpdatable(id, jwtPayload);
 
     const user = await this.userProfileRepository.findOne(id);
 
@@ -50,19 +57,20 @@ export class UserService {
       throw new NotFoundException('유저 정보를 찾을 수 없습니다.');
     }
 
-    // if (_.isEmpty(user) === true) {
-    //   throw new NotFoundException('유저 정보를 찾을 수 없습니다.');
-    // }
-
     user.update(updateUserProfileDto);
     return this.userProfileRepository.save(user);
   }
 
-  async deleteUser(id: string): Promise<boolean> {
+  async deleteUser(
+    id: string,
+    jwtPayload: { id: string; role: Role },
+  ): Promise<boolean> {
+    this.checkUpdatable(id, jwtPayload);
     return this.userRepository.deleteUser(id);
   }
 
-  readAllUser(): Promise<UserProfile[]> {
+  readAllUser(jwtPayload: { id: string; role: Role }): Promise<UserProfile[]> {
+    this.onlyAccessableAdmin(jwtPayload);
     return this.userProfileRepository.readAllUser();
   }
 
@@ -96,5 +104,25 @@ export class UserService {
     const writtenBoardsDto = new WrittenBoardsDto();
     writtenBoardsDto.boards = user.getBoards();
     return writtenBoardsDto;
+  }
+
+  private checkUpdatable(
+    userId: string,
+    jwtPayload: { id: string; role: Role },
+  ): void {
+    if (jwtPayload.role !== Role.ADMIN) {
+      throw new BadRequestException();
+    }
+    if (jwtPayload.id !== userId) {
+      throw new BadRequestException(
+        `user(${jwtPayload.id}) Cannot update other user`,
+      );
+    }
+  }
+
+  private onlyAccessableAdmin(jwtPayload: { id: string; role: Role }) {
+    if (jwtPayload.role != Role.ADMIN) {
+      throw new BadRequestException();
+    }
   }
 }

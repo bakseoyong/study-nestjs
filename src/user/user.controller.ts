@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   Request,
   UseGuards,
   UsePipes,
@@ -42,11 +43,13 @@ export class UserController {
     description: '유저 정보를 수정합니다.',
   })
   @Patch('/update-user')
+  @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
   updateUser(
     @Body() updateUserProfileDto: UpdateUserProfileDto,
+    @Req() req,
   ): Promise<UserProfileDto> {
-    return this.userService.update(updateUserProfileDto);
+    return this.userService.update(updateUserProfileDto, req.user);
   }
 
   @ApiOperation({
@@ -56,8 +59,8 @@ export class UserController {
   @Delete('/delete-user-by-self')
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
-  deleteUserBySelf(id: string): Promise<boolean> {
-    return this.userService.deleteUser(id);
+  deleteUserBySelf(id: string, @Req() req): Promise<boolean> {
+    return this.userService.deleteUser(id, req.user);
   }
 
   @ApiOperation({
@@ -67,8 +70,8 @@ export class UserController {
   @Delete('/delete-user-by-role')
   @Roles([Role.ADMIN, Role.MANAGER])
   @UsePipes(ValidationPipe)
-  deleteUserByRole(id: string): Promise<boolean> {
-    return this.userService.deleteUser(id);
+  deleteUserByRole(id: string, @Req() req): Promise<boolean> {
+    return this.userService.deleteUser(id, req.user);
   }
 
   @ApiOperation({
@@ -77,9 +80,10 @@ export class UserController {
   })
   @UseGuards(JwtAuthGuard)
   @Get('/read-all-user')
+  @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
-  readAllUser(): Promise<UserProfile[]> {
-    return this.userService.readAllUser();
+  readAllUser(@Req() req): Promise<UserProfile[]> {
+    return this.userService.readAllUser(req.user);
   }
 
   @ApiOperation({
