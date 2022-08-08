@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
   Post,
@@ -19,6 +20,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { Role, UserProfile } from 'src/entity/user-profile.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
+import { UserActivityDto } from './dto/user-activity.dto';
 import { UserProfileDto } from './dto/user-profile.dto';
 import { WrittenBoardsDto } from './dto/written-board.dto';
 import { UserService } from './user.service';
@@ -35,7 +37,27 @@ export class UserController {
   @Post('/create-user')
   @UsePipes(ValidationPipe)
   createUser(@Body() createUserDto: CreateUserDto): Promise<UserProfileDto> {
-    return this.userService.createUser(createUserDto);
+    return this.userService.create(createUserDto);
+  }
+
+  @ApiOperation({
+    summary: '프로필 조회 API',
+    description: '프로필을 조회합니다.',
+  })
+  @UseGuards(JwtAuthGuard)
+  @Get('/read-profile/:id')
+  readProfile(@Param('id') id, @Req() req): Promise<UserProfileDto> {
+    return this.userService.readProfile(id, req.user);
+  }
+
+  @ApiOperation({
+    summary: '활동내역 조회 API',
+    description: '활동내역을 조회합니다.',
+  })
+  @UseGuards(JwtAuthGuard)
+  @Get('/read-activity/:id')
+  readActivity(@Param('id') id, @Req() req): Promise<UserActivityDto> {
+    return this.userService.readActivity(id, req.user);
   }
 
   @ApiOperation({
@@ -56,22 +78,11 @@ export class UserController {
     summary: '유저 삭제 (본인)) API',
     description: '회원탈퇴를 합니다.',
   })
-  @Delete('/delete-user-by-self')
+  @Delete('/delete-user/:id')
   @UseGuards(JwtAuthGuard)
   @UsePipes(ValidationPipe)
-  deleteUserBySelf(id: string, @Req() req): Promise<boolean> {
-    return this.userService.deleteUser(id, req.user);
-  }
-
-  @ApiOperation({
-    summary: '유저 삭제 (관리자) API',
-    description: '관리자가 유저를 삭제합니다.',
-  })
-  @Delete('/delete-user-by-role')
-  @Roles([Role.ADMIN, Role.MANAGER])
-  @UsePipes(ValidationPipe)
-  deleteUserByRole(id: string, @Req() req): Promise<boolean> {
-    return this.userService.deleteUser(id, req.user);
+  deleteUserBySelf(@Param('id') id: string, @Req() req): Promise<boolean> {
+    return this.userService.delete(id, req.user);
   }
 
   @ApiOperation({

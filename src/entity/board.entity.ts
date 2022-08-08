@@ -21,7 +21,6 @@ import {
 import { BoardHashtag } from './board-hashtag.entity';
 import { Comment } from './comment.entity';
 import { BoardDto } from './dto/board.dto';
-import { Scrap } from './scrap.entity';
 import { UserActivity } from './user-activity.entity';
 
 @Entity({ name: 'boards' })

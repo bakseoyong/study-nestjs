@@ -20,12 +20,12 @@ import { User } from './user.entity';
 
 @Entity({ name: 'user_activities' })
 @Unique(['user'])
-export class UserActivity extends BaseEntity {
+export class UserActivity {
   @PrimaryColumn()
   id: string;
 
   @ApiProperty({})
-  @OneToOne(() => User, (user) => user.userProfile, { cascade: true })
+  @OneToOne(() => User, (user) => user.userProfile, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
@@ -75,10 +75,10 @@ export class UserActivity extends BaseEntity {
     return userActivityDto;
   }
 
-  create(userId: string): User {
-    const user = new User();
-    user.id = userId;
-    return user;
+  static async create(userId: string): Promise<UserActivity> {
+    const activity = new UserActivity();
+    activity.id = userId;
+    return activity;
   }
 
   addChatRoom(room: Room) {

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import _ from 'lodash';
@@ -27,20 +28,21 @@ export class UserService {
     private readonly userActivityRepository: UserActivityRepository,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<UserProfileDto> {
-    const userProfile = new UserProfile();
-    userProfile.create(createUserDto);
-    await this.userProfileRepository.save(userProfile);
+  async create(createUserDto: CreateUserDto): Promise<UserProfileDto> {
+    const profile = await UserProfile.create(createUserDto);
+    await this.userProfileRepository.save(profile);
 
-    const user = new User();
-    user.create(userProfile.getId());
+    const user = await User.create(profile.getId());
     await this.userRepository.save(user);
 
-    const userActivity = new UserActivity();
-    userActivity.create(userProfile.getId());
-    await this.userActivityRepository.save(userActivity);
+    const activity = await UserActivity.create(profile.getId());
 
-    return userProfile;
+    activity.user = user;
+    profile.user = user;
+    await this.userProfileRepository.save(profile);
+    await this.userActivityRepository.save(activity);
+
+    return profile;
   }
 
   async update(
@@ -49,7 +51,7 @@ export class UserService {
   ): Promise<UserProfileDto> {
     const { id } = updateUserProfileDto;
 
-    this.checkUpdatable(id, jwtPayload);
+    this.checkCRUDable(id, jwtPayload);
 
     const user = await this.userProfileRepository.findOne(id);
 
@@ -61,12 +63,14 @@ export class UserService {
     return this.userProfileRepository.save(user);
   }
 
-  async deleteUser(
+  async delete(
     id: string,
     jwtPayload: { id: string; role: Role },
   ): Promise<boolean> {
-    this.checkUpdatable(id, jwtPayload);
-    return this.userRepository.deleteUser(id);
+    this.checkCRUDable(id, jwtPayload);
+    const user = await this.userRepository.findOne(id);
+    this.userRepository.remove(user);
+    return true;
   }
 
   readAllUser(jwtPayload: { id: string; role: Role }): Promise<UserProfile[]> {
@@ -106,18 +110,30 @@ export class UserService {
     return writtenBoardsDto;
   }
 
-  private checkUpdatable(
+  async readProfile(
+    id: string,
+    user: { id: string; role: Role },
+  ): Promise<UserProfileDto> {
+    this.checkCRUDable(id, user);
+    return this.userProfileRepository.findOne(id);
+  }
+
+  async readActivity(
+    id: string,
+    user: { id: string; role: Role },
+  ): Promise<UserActivityDto> {
+    this.checkCRUDable(id, user);
+    return this.userActivityRepository.findOne(id);
+  }
+
+  private checkCRUDable(
     userId: string,
     jwtPayload: { id: string; role: Role },
   ): void {
-    if (jwtPayload.role !== Role.ADMIN) {
-      throw new BadRequestException();
+    if (jwtPayload.role === Role.ADMIN || jwtPayload.id === userId) {
+      return;
     }
-    if (jwtPayload.id !== userId) {
-      throw new BadRequestException(
-        `user(${jwtPayload.id}) Cannot update other user`,
-      );
-    }
+    throw new BadRequestException();
   }
 
   private onlyAccessableAdmin(jwtPayload: { id: string; role: Role }) {
