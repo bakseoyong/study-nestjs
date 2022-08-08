@@ -110,6 +110,7 @@ export class UserService {
     return writtenBoardsDto;
   }
 
+  //Get - 다른 서비스에서 호출, Read - API를 통한 호출
   async readProfile(
     id: string,
     user: { id: string; role: Role },

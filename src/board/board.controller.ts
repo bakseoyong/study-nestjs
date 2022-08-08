@@ -115,7 +115,7 @@ export class BoardController {
   async updateBoard(
     @Req() req,
     @Body() updateBoardDto: UpdateBoardDto,
-    @Param('id') boardId,
+    @Param('id') boardId: number,
   ): Promise<boolean> {
     await this.boardService.checkAuthor(req.user.id, boardId);
     return this.boardService.update(updateBoardDto, boardId);
@@ -127,7 +127,7 @@ export class BoardController {
   })
   @Get('/like/:id')
   @UseGuards(JwtAuthGuard)
-  likeBoard(@Req() req, @Param('id') boardId): Promise<number> {
+  likeBoard(@Req() req, @Param('id') boardId: number): Promise<number> {
     return this.boardService.likeBoard(req.user.id, boardId);
   }
 }

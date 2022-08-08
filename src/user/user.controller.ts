@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Logger,
   Param,
   Patch,
   Post,
@@ -16,8 +15,7 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
-import { Roles } from 'src/decorators/roles.decorator';
-import { Role, UserProfile } from 'src/entity/user-profile.entity';
+import { UserProfile } from 'src/entity/user-profile.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UserActivityDto } from './dto/user-activity.dto';
@@ -46,7 +44,7 @@ export class UserController {
   })
   @UseGuards(JwtAuthGuard)
   @Get('/read-profile/:id')
-  readProfile(@Param('id') id, @Req() req): Promise<UserProfileDto> {
+  readProfile(@Param('id') id: string, @Req() req): Promise<UserProfileDto> {
     return this.userService.readProfile(id, req.user);
   }
 
@@ -56,7 +54,7 @@ export class UserController {
   })
   @UseGuards(JwtAuthGuard)
   @Get('/read-activity/:id')
-  readActivity(@Param('id') id, @Req() req): Promise<UserActivityDto> {
+  readActivity(@Param('id') id: string, @Req() req): Promise<UserActivityDto> {
     return this.userService.readActivity(id, req.user);
   }
 
