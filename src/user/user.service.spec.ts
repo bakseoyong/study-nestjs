@@ -73,7 +73,7 @@ describe('유저 서비스', () => {
     userProfileRepository.readAllUser.mockResolvedValue(1);
     userProfileRepository.findByLogin.mockResolvedValue(1);
     userProfileRepository.findOne.mockResolvedValue(undefined);
-    userActivityRepository.getById.mockResolvedValue(1);
+    userActivityRepository.findOne.mockResolvedValue(1);
     userActivityRepository.save.mockResolvedValue(1);
   });
 

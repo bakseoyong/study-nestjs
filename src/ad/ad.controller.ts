@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { AdService } from './ad.service';
 import { CreateAdvertiserDto } from './dto/create-advertiser.dto';
+import { UpdateAdvertiserDto } from './dto/update-advertiser.dto';
 
 @Controller('ad')
 export class AdController {
@@ -16,6 +17,17 @@ export class AdController {
     @Body() createAdvertiserDto: CreateAdvertiserDto,
   ): Promise<CreateAdvertiserDto> {
     return this.adService.createAdvertiser(createAdvertiserDto);
+  }
+
+  @ApiOperation({
+    summary: '광고주 계정 업데이트 API',
+    description: '광고주 계정 업데이트.',
+  })
+  @Post('/update-advertiser/:uid')
+  updateAdvertiser(
+    @Body() updateAdvertiserDto: UpdateAdvertiserDto,
+  ): Promise<UpdateAdvertiserDto> {
+    return this.adService.updateAdvertiser(updateAdvertiserDto);
   }
 
   // @ApiOperation({

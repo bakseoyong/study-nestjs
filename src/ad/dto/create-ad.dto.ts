@@ -1,4 +1,4 @@
-import { AdType } from 'src/entity/ad.entity';
+import { AdFeatureType } from 'src/entity/ad.entity';
 import { Advertiser } from 'src/entity/advertiser.entity';
 
 export class CreateAdDto {
@@ -6,5 +6,5 @@ export class CreateAdDto {
   created: Date;
   terminated: Date;
   url: string;
-  type: AdType;
+  type: AdFeatureType;
 }

@@ -12,21 +12,24 @@ import { AdManager } from './adManager.entity';
 import { Advertiser } from './advertiser.entity';
 import { Role } from './user-profile.entity';
 
-export enum AdStatus {
-  심사 = 1,
-  게시 = 2,
-  종료 = 3,
-  차단 = 4,
-  중단 = 5,
-  승인 = 6,
-}
+export const AdStatus = {
+  심사: 1,
+  게시: 2,
+  종료: 3,
+  차단: 4,
+  중단: 5,
+  승인: 6,
+} as const;
 
-export enum AdType {
-  미지정 = 0,
-  행사 = 1,
-  판매 = 2,
-  공익 = 3,
-}
+export const AdFeature = {
+  미지정: 0,
+  행사: 1,
+  판매: 2,
+  공익: 3,
+} as const;
+
+export type AdStatusType = typeof AdStatus[keyof typeof AdStatus];
+export type AdFeatureType = typeof AdFeature[keyof typeof AdFeature];
 
 @Entity({ name: 'ad' })
 @Unique(['id'])
@@ -48,13 +51,13 @@ export class Ad {
   terminated: Date;
 
   @Column('boolean', { default: 1 }) //심사
-  status: number;
+  status: AdStatusType;
 
   @Column('varchar')
   url: string;
 
   @Column('integer', { default: 0 }) //미지정
-  type: AdType;
+  type: AdFeatureType;
 
   @Column('integer')
   view: number;
@@ -63,7 +66,7 @@ export class Ad {
   click: number;
 
   //수정, 종료기간 연장, 종료, 해당광고 요금계산
-  craete(createAdDto: CreateAdDto, adManager: AdManager): Ad {
+  static craete(createAdDto: CreateAdDto, adManager: AdManager): Ad {
     const ad = new Ad();
     const { advertiser, created, terminated, url, type } = createAdDto;
     ad.advertiser = advertiser;
@@ -75,7 +78,7 @@ export class Ad {
     return ad;
   }
 
-  setStatus(adManager: AdManager, adStatus: AdStatus) {
+  setStatus(adManager: AdManager, adStatus: AdStatusType) {
     if (adManager.getRole() === Role.MANAGER) {
       this.status = adStatus;
     }

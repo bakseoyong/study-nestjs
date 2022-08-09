@@ -5,11 +5,12 @@ import { AdRepository } from 'src/repository/ad.repository';
 import { CreateAdvertiserDto } from './dto/create-advertiser.dto';
 import { Role } from 'src/entity/user-profile.entity';
 import { AdManager } from 'src/entity/adManager.entity';
+import { UpdateAdvertiserDto } from './dto/update-advertiser.dto';
 
 @Injectable()
 export class AdService {
   constructor(
-    private readonly adRepoistory: AdRepository,
+    // private readonly adRepoistory: AdRepository,
     private readonly advertiserRepository: AdvertiserRepository,
   ) {}
 
@@ -27,10 +28,19 @@ export class AdService {
     createAdvertiserDto: CreateAdvertiserDto,
   ): Promise<CreateAdvertiserDto> {
     const adManager = await this.matchingManager();
-    const advertiser = new Advertiser();
-    await advertiser.create(createAdvertiserDto, adManager);
+    const advertiser = await Advertiser.create(createAdvertiserDto);
     adManager.approveAccount(advertiser);
     this.advertiserRepository.save(advertiser);
     return advertiser;
+  }
+
+  async updateAdvertiser(
+    updateAdvertiserDto: UpdateAdvertiserDto,
+  ): Promise<UpdateAdvertiserDto> {
+    const advertiser = await this.advertiserRepository.findOne(
+      updateAdvertiserDto.id,
+    );
+    advertiser.update(updateAdvertiserDto);
+    return this.advertiserRepository.save(advertiser);
   }
 }
