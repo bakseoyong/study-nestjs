@@ -23,6 +23,7 @@ import {
 import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserProfileDto } from 'src/user/dto/update-user-profile.dto';
+import { Logger } from '@nestjs/common';
 
 export enum Role {
   ADMIN = 'ADMIN',
@@ -42,13 +43,13 @@ const strToEnumDept = {
 
 @Entity({ name: 'user_profiles' })
 @Unique(['user'])
-export class UserProfile extends BaseEntity {
+export class UserProfile {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @ApiProperty({})
-  @OneToOne(() => User, (user) => user.userProfile, { cascade: true })
-  @JoinColumn()
+  @OneToOne(() => User, (user) => user.userProfile, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @ApiProperty({
@@ -149,9 +150,10 @@ export class UserProfile extends BaseEntity {
   @DeleteDateColumn({ name: 'deleted', comment: 'Deleted Date' })
   deleted: Date;
 
-  public async create(createUserDto: CreateUserDto): Promise<UserProfile> {
+  static async create(createUserDto: CreateUserDto): Promise<UserProfile> {
     const { uid, email, phone } = createUserDto;
     const password = await bcrypt.hash(createUserDto.password, 10);
+    Logger.log(uid);
 
     const userProfile = new UserProfile();
     userProfile.uid = uid;
