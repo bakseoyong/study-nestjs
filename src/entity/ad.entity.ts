@@ -34,6 +34,10 @@ export type AdFeatureType = typeof AdFeature[keyof typeof AdFeature];
 @Entity({ name: 'ad' })
 @Unique(['id'])
 export class Ad {
+  @ApiProperty({
+    example: 1,
+    description: 'ID',
+  })
   @PrimaryGeneratedColumn()
   id: number;
 

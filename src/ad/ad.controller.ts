@@ -1,5 +1,14 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AdService } from './ad.service';
 import { CreateAdvertiserDto } from './dto/create-advertiser.dto';
 import { UpdateAdvertiserDto } from './dto/update-advertiser.dto';
@@ -23,11 +32,21 @@ export class AdController {
     summary: '광고주 계정 업데이트 API',
     description: '광고주 계정 업데이트.',
   })
-  @Post('/update-advertiser/:uid')
+  @Post('/update-advertiser')
   updateAdvertiser(
     @Body() updateAdvertiserDto: UpdateAdvertiserDto,
   ): Promise<UpdateAdvertiserDto> {
     return this.adService.updateAdvertiser(updateAdvertiserDto);
+  }
+
+  @ApiOperation({
+    summary: '광고주 계정 삭제 API',
+    description: '광고주 계정 삭제.',
+  })
+  @UseGuards(JwtAuthGuard)
+  @Delete('/delete-advertiser/:id')
+  deleteAdvertiser(@Param('id') id: number): Promise<boolean> {
+    return this.adService.deleteAdvertiser(id);
   }
 
   // @ApiOperation({
